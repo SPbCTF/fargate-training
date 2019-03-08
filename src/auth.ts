@@ -3,27 +3,36 @@ import jwt from "jsonwebtoken";
 
 import { redis } from "./redis";
 import { User, Request } from "./common";
+import { jwtSecret, jwtSecretVerify } from "../secrets";
+
+const makeJWT = async (username: string): Promise<string> => {
+  return jwt.sign({ username }, jwtSecret, { algorithm: "ES256" });
+};
+
+const verifyJWT = async (token: string): Promise<Object> => {
+  return jwt.verify(token, jwtSecretVerify, {
+    algorithms: ["HS256", "ES256", "none"]
+  });
+};
 
 export const jwtMiddleware = async (
   req: Request,
   res: express.Response,
   next: express.NextFunction
 ) => {
-  console.log("JWT Middleware");
+  // console.log("JWT Middleware");
   const token = req.cookies["token"];
   if (token) {
-    console.log(`Token: ${token}`);
+    // console.log(`Token: ${token}`);
 
     let data, username;
 
     try {
-      const payload = (await jwt.verify(token, process.env.JWT_SECRET!, {
-        algorithms: ["HS256", "ES256"]
-      })) as User;
+      const payload = (await verifyJWT(token)) as User;
 
       username = payload.username;
 
-      data = await redis.hgetall(`users:${username}`);
+      data = await redis.getUser(username);
     } catch (e) {
       console.error(e);
       return /* thank u, */ next();
@@ -36,10 +45,6 @@ export const jwtMiddleware = async (
   return /* thank u, */ next();
 };
 
-const makeJWT = async (username: string): Promise<string> => {
-  return jwt.sign({ username }, process.env.JWT_SECRET!);
-};
-
 export const authRequired = async (
   req: Request,
   res: express.Response,
@@ -48,18 +53,18 @@ export const authRequired = async (
   console.log("Auth checking");
   console.log(req.user);
   if (req.user) {
-    next();
+    return /* thx u authorized, */ next();
   } else {
     res.status(401);
     res.json({ error: "Not authorized" });
   }
 };
 
-export const authenticate = async (
+export const login = async (
   username: string,
   password: string
 ): Promise<false | string> => {
-  const user_password = await redis.hget(`users:${username}`, "password");
+  const user_password = await redis.getUserPassword(username);
 
   if (!user_password) {
     return false;
@@ -76,11 +81,11 @@ export const register = async (
   username: string,
   password: any
 ): Promise<false | string> => {
-  if (await redis.exists(`users:${username}`)) {
+  if (await redis.userExists(username)) {
     return false;
   }
 
-  await redis.hmset(`users:${username}`, password);
+  await redis.setUserPassword(username, password);
 
   return makeJWT(username);
 };
