@@ -4,9 +4,10 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && cp secrets/{private,public}.pem dist/secrets/",
+    "copy": "cp secrets/{private,public}.pem dist/secrets/ && cp .env dist/.env",
     "dev": "tsnd --respawn index.ts",
-    "start": "yarn build && node dist/"
+    "build": "tsc && yarn copy",
+    "start": "node dist/"
   },
   "dependencies": {
     "body-parser": "^1.18.3",

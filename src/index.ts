@@ -1,7 +1,3 @@
-// import { resolve } from "path";
-// // tslint:disable-next-line:no-var-requires
-// require("dotenv").config({ path: resolve(__dirname, "..", ".env") });
-
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import express from "express";
