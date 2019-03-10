@@ -1,9 +1,9 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 
-import { redis } from "./redis";
-import { User, Request } from "./common";
 import { jwtSecret, jwtSecretVerify } from "../secrets";
+import { Request, User } from "./common";
+import { redis } from "./redis";
 
 const makeJWT = async (username: string): Promise<string> => {
   return jwt.sign({ username }, jwtSecret, { algorithm: "ES256" });
@@ -11,20 +11,17 @@ const makeJWT = async (username: string): Promise<string> => {
 
 const verifyJWT = async (token: string): Promise<Object> => {
   return jwt.verify(token, jwtSecretVerify, {
-    algorithms: ["HS256", "ES256", "none"]
+    algorithms: ["HS256", "ES256", "none"],
   });
 };
 
 export const jwtMiddleware = async (
   req: Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) => {
-  // console.log("JWT Middleware");
-  const token = req.cookies["token"];
+  const token = req.cookies.token;
   if (token) {
-    // console.log(`Token: ${token}`);
-
     let data, username;
 
     try {
@@ -34,12 +31,13 @@ export const jwtMiddleware = async (
 
       data = await redis.getUser(username);
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       return /* thank u, */ next();
     }
 
     if (data) {
-      req.user = { username } as User;
+      req.user = data;
+      console.log(req.user);
     }
   }
   return /* thank u, */ next();
@@ -48,10 +46,8 @@ export const jwtMiddleware = async (
 export const authRequired = async (
   req: Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) => {
-  console.log("Auth checking");
-  console.log(req.user);
   if (req.user) {
     return /* thx u authorized, */ next();
   } else {
@@ -62,7 +58,7 @@ export const authRequired = async (
 
 export const login = async (
   username: string,
-  password: string
+  password: string,
 ): Promise<false | string> => {
   const user_password = await redis.getUserPassword(username);
 
@@ -79,13 +75,19 @@ export const login = async (
 
 export const register = async (
   username: string,
-  password: any
+  secret: string,
+  password: any,
 ): Promise<false | string> => {
   if (await redis.userExists(username)) {
     return false;
   }
 
-  await redis.setUserPassword(username, password);
+  await redis.registerUser({
+    username,
+    secret,
+    accessLevel: 0,
+    password,
+  } as User);
 
   return makeJWT(username);
 };
