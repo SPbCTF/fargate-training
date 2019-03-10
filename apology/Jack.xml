@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<root>
+  <apologies>
+    <apology private="true" nickname_receiver="Mailo">
+      <apology_text>IMSorry</apology_text>
+    </apology>
+    <apology private="false" nickname_receiver="KKKS_"><apology_text>HAX</apology_text></apology>
+    <apology private="false" nickname_receiver="KKKS_"><apology_text>HAX1</apology_text></apology>
+  </apologies>
+</root>

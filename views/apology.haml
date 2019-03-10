@@ -1,0 +1,10 @@
+!!!
+%html
+  %body
+    .content Принести извинения
+    %form{:action => "/apology", :method => "post"}
+      %div
+        %input{:type => "text", :name => "nickname_receiver", :placeholder => "Кому"}
+        %input{:type => "text", :name => "private", :placeholder => "Приватно?(true|false)"}
+        %input{:type => "text", :name => "apology_text", :placeholder => "Текст"}
+        %input{:type => "submit", :value => "Отправить", :name => "submit"}

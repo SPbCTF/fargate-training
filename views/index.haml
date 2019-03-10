@@ -1,0 +1,27 @@
+!!!
+%html
+  %body
+    -if authorized?
+      %p
+        %a{:href => "/logout"}Простите, я пошел
+      .content Поиск извинений
+      %form{:action => "/apology", :method => "get"}
+        %div
+          %input{:type => "text", :name => "nickname_sender", :placeholder => "Имя извиняющегося"}
+          %input{:type => "submit", :value => "Отправить", :name => "submit"}
+      -if locals[:result_find]
+        .content Результат поиска:
+        %table 
+          - locals[:result_find].each do |object|
+            %tr
+              %td= object
+      .content Публичные извинения, которое принесли прямо сейчас:
+    -else
+      %p 
+        %a{:href => "/login"}Извините, можно войти?
+      %p
+        %a{:href => "/register"}Прошу прощения, меня зовут..
+    -if locals[:message]
+      .content Сообщение:
+      .content= locals[:message]
+      
