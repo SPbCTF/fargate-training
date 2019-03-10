@@ -1,11 +1,17 @@
+FROM node:alpine AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN yarn install && yarn dist
+
 FROM node:alpine
 
 WORKDIR /app
 
-ADD . .
+COPY --from=builder /app/dist  /app/package.json /app/yarn.lock ./
 
-RUN yarn install
+RUN yarn install --production
 
-RUN yarn build
-
-CMD ["yarn", "start"]
+CMD ["yarn", "start:docker"]
