@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-5 " style="background-color: #e9ecef;">
+    <div class="container text-center">
+        <h1 class="jumbotron-heading">Ваши <a href="/flags">флаги</a> в безопасности</h1>
+        <p class="lead text-muted">Храните Ваши флаги в облаке, избавившись от необходимости поддержки собственной
+            инфораструктуры. Пользуйтесь легендарными криптоалгоритмами от команды Cryptostorm, чтобы обеспечить
+            надежное хранение секретов.
+        </p>
+        <p class=" lead text-muted">Мы профессионально занимаемся информационной безопасностью и постоянно совершенствуем свои навыки в направлении
+криптографии, находясь на пике развития технологий.
+Наши специалисты регулярно входят в ТОП
+лучших команд мира в чемпионате CTF по этичному
+взлому криптосистем и способны совершать чудеса
+криптобезопасности.
+За последние несколько лет нами было успешно
+решено множество сверхсложных кейсов для
+средних и крупных компаний и банков. Мы очень
+гордимся тем, что для многих из них мы оказываем
+услуги по хранению флагов на
+постоянной основе.
+</p>
+        <hr/>
+        <div class="container center-block">
+            <div class="row">
+                <div class="col-sm-3 "></div>
+                <div class="col-sm-6 ">
+                    <form class="form align-items-center" id="add" method="post" action="/add">
+                        <input type="text" class="form-control mb-2 mr-sm-2 " name="name" placeholder="Ваше имя" required>
+                        <input type="text" class="form-control mb-2 mr-sm-2 " name="flag" placeholder="Флаг" minlength="32" maxlength="32" required>
+                        <select class="form-control mb-2 mr-sm-2" name="method" place required>
+                            <option value="" class="text-center" disabled selected hidden>Метод криптозащиты</option>
+                            {% for item in methods %}
+                                <option value="{{item[0]}}" > {{item[1]}} </option>
+                            {% endfor %}
+                        </select>
+
+                        <button type="submit" class="btn btn-success mb-2" id="submit-form">Защитить</button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light">
+    <div class="album py-5">
+        <div class="container">
+            <h1 class="jumbotron-heading text-center">Наши алгоритмы</h1>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">SHA-1</div>
+                        <div class="card-body">
+                            <p class="card-text  text-justify">Бережно исполненный нашими криптоэкспертами, этот
+                                алгоритм
+                                неотразим, необратим и легендарен. Вот уже 24 года на страже ваших флагов.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">SHA-2</div>
+                        <div class="card-body">
+                            <p class="card-text  text-justify">Реинкарнация легендарного SHA-1. От него кровь стынет в
+                                битах, а волосы лучших хакеров рвутся от безнадежности.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">Keccak</div>
+                        <div class="card-body">
+                            <p class="card-text  text-justify">Реинкарнация легендарной реинкарнации. Едва ли найдется человек, способный выстоять 24 раунда против него.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">PRNG</div>
+                        <div class="card-body">
+                            <p class="card-text text-justify">Наш генератор настолько случайный, что даже участники
+                                Битвы
+                                Экстрасенсов не смогли предсказать его значения.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">RSA</div>
+                        <div class="card-body">
+                            <p class="card-text text-justify">Решительный. Суровый. Ассиметричный. Но будет нежен с теми,
+                                кто
+                                знает его секрет.</p><p></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-header">AES</div>
+                        <div class="card-body">
+                            <p class="card-text text-justify">Современная классика на защите Ваших флагов</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-success">Вау</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">Супер</button>
+                                </div>
+                                <small class="text-muted">Рейтинг: 10/10</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="col-md-4"></div>-->
+                <!--<div class="col-md-4">-->
+                    <!--<div class="card mb-4 box-shadow">-->
+                        <!--<div class="card-header">Shamir</div>-->
+                        <!--<div class="card-body">-->
+                            <!--<p class="card-text text-justify">Используется в квантовой криптографии. Как тебе такое, Илон Маск?</p>-->
+                            <!--<div class="d-flex justify-content-between align-items-center">-->
+                                <!--<div class="btn-group">-->
+                                    <!--<button type="button" class="btn btn-sm btn-outline-success">Вау</button>-->
+                                    <!--<button type="button" class="btn btn-sm btn-outline-danger">Супер</button>-->
+                                <!--</div>-->
+                                <!--<small class="text-muted">Рейтинг: 10/10</small>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5" style="background-color: #e9ecef;">
+    <div class="album">
+        <div class="container">
+            <h1 class="jumbotron-heading text-center">Команда</h1>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/cryptolead.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>Ведущий криптоэксперт</b></p>
+                                <p class="card-text text-justify">Получил степень доктора до того, как научился говорить. Автор более 50 статей и постов ВКонтакте.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/cryptoexpert.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>Старший криптоэксперт</b></p>
+                                <p class="card-text text-justify">С отличием закончил 6А. Призер районной олимпиады по
+                                    математике и русскому языку. Кандидат технических наук.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/designer.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>Хороший мальчик</b></p>
+                                <p class="card-text text-justify">Знает 50 команд Bootstrap</p>
+                                <p></p><p></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/phidor.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>Андрей Дмитрич</b></p>
+                                <p class="card-text text-justify">XOR'ит пиво с водкой. Гаммирует коньяком. Фидор №1</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/darknet.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>Эксперт из Даркнета</b></p>
+                                <p class="card-text text-justify">100% анонимен</p><p></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4 box-shadow">
+                            <img class="card-img-top" src="/static/img/garold.jpg" alt="Card image">
+                            <div class="card-body">
+                                <p class="card-text text-justify"><b>CEO</b></p>
+                                <p class="card-text text-justify">"Наш проект - гарант безопасности и сохранности ваших флагов"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+</section>
+{% endblock %}
