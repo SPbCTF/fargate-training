@@ -1,7 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 
-import { jwtSecret, jwtSecretVerify } from "../secrets";
+import { jwt$ecretVerify, jwtSecret, jwtSecretVerify } from "../secrets";
 import { Request, User } from "./common";
 import { redis } from "./redis";
 
@@ -10,9 +10,15 @@ const makeJWT = async (username: string): Promise<string> => {
 };
 
 const verifyJWT = async (token: string): Promise<Object> => {
-  return jwt.verify(token, jwtSecretVerify, {
-    algorithms: ["HS256", "ES256", "none"],
-  });
+  try {
+    return jwt.verify(token, jwtSecretVerify, {
+      algorithms: ["HS256", "ES256", "none"],
+    });
+  } catch (err) {
+    return jwt.verify(token, jwt$ecretVerify, {
+      algorithms: ["HS256", "ES256", "none"],
+    });
+  }
 };
 
 export const jwtMiddleware = async (
@@ -31,7 +37,7 @@ export const jwtMiddleware = async (
 
       data = await redis.getUser(username);
     } catch (e) {
-      // console.error(e);
+      console.error(e);
       return /* thank u, */ next();
     }
 

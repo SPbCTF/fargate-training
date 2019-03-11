@@ -29,14 +29,9 @@ class Database {
     await this._redis.hmset(`user:${name}`, ...fields);
   }
 
-  public async registerUser(
-    // name: string,
-    // secret: string,
-    // accessLevel: number,
-    // password: any,
-    user: User,
-  ): Promise<void> {
+  public async registerUser(user: User): Promise<void> {
     const { username, secret, accessLevel, password } = user;
+    console.log(`Password: ${password}`);
     await this.setUserFields(username, [
       "username",
       username,
@@ -45,7 +40,7 @@ class Database {
       "accessLevel",
       accessLevel,
       "password",
-      ...password,
+      password,
     ]);
   }
 

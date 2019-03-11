@@ -1,9 +1,12 @@
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express from "express";
 import morgan from "morgan";
+import { resolve } from "path";
+import { jwtSecretVerify } from "../secrets";
 import { authRequired, jwtMiddleware, login, register } from "./auth";
-import { Request, User } from "./common";
+import { Request, User, Zakupka } from "./common";
 import { redis } from "./redis";
 
 export const startServer = (port: number) => {
@@ -11,20 +14,31 @@ export const startServer = (port: number) => {
 
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
+  // app.use(cors());
   app.use(morgan("dev"));
+
+  app.all(
+    "*",
+    (req: Request, res: express.Response, next: express.NextFunction) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Methods", "DELETE, PUT, GET, POST");
+      res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept",
+      );
+      next();
+    },
+  );
+
+  app.set("view engine", "pug");
+  app.set("views", resolve(__dirname, "./views"));
 
   app.use(jwtMiddleware);
 
-  app.use(
-    async (
-      err: Error,
-      req: Request,
-      res: express.Response,
-      next: express.NextFunction,
-    ) => {
-      console.error(err);
-      res.status(500);
-      res.send(":(");
+  app.get(
+    "/",
+    (req: Request, res: express.Response, next: express.NextFunction) => {
+      res.render("index");
     },
   );
 
@@ -79,10 +93,10 @@ export const startServer = (port: number) => {
   );
 
   app.get(
-    "/secret",
-    authRequired,
-    async (req: Request, res: express.Response) => {
-      res.json("secret");
+    "/pubkey",
+    async (req: Request, res: express.Response, next: express.NextFunction) => {
+      res.status(200);
+      res.send(jwtSecretVerify);
     },
   );
 
@@ -125,7 +139,10 @@ export const startServer = (port: number) => {
       }
 
       if (!req.user || req.user!.accessLevel !== zakupka!.accessLevel) {
-        res.json({ success: false, error: "You don't have acccess!" });
+        res.json({
+          success: false,
+          error: "You don't have required acccessLevel!",
+        });
         return;
       }
 
@@ -136,13 +153,40 @@ export const startServer = (port: number) => {
   app.post(
     "/zakupka",
     authRequired,
-    async (req: Request, res: express.Response) => {
+    async (req: Request, res: express.Response, next: express.NextFunction) => {
       const { name, description, price, accessLevel } = req.body;
 
       if (!name || !description || !price || !accessLevel) {
         res.status(200);
         res.json({ success: false, error: "Not all fields provided!" });
       }
+
+      try {
+        await redis.createZakupka({
+          name,
+          description,
+          price,
+          accessLevel,
+        } as Zakupka);
+      } catch (err) {
+        next(err);
+      }
+
+      res.status(200);
+      res.json({ success: true });
+    },
+  );
+
+  app.use(
+    (
+      err: Error,
+      req: Request,
+      res: express.Response,
+      next: express.NextFunction,
+    ) => {
+      console.error(err);
+      res.status(500);
+      res.send(":(");
     },
   );
 
