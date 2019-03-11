@@ -9,3 +9,8 @@ docker build -t imsorry_image .
 ```
 docker run -p 4567:4567 -it --name imsorry_service imsorry_image rackup -o 0.0.0.0 -p 4567
 ```
+
+Заходим на:
+```
+http://127.0.0.1:4567/
+```
