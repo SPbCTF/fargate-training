@@ -5,15 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <signal.h>
+
 
 #include "proto.h"
 #include "analytics.h"
 
-
-#define DATA_DIR "data"
-// todo
-//  alarm 3 to kill processess
-//  traffic obfuscation
 
 void* (* allocator_alloc)( size_t );
 void (* allocator_dealloc)( void* );
@@ -59,7 +56,7 @@ void cmd_head( tl_t header )
     snprintf( abs, 4000, "data/%s_%s", root_ctx->auth->uid, fname );
 
     FILE* f = fopen( abs, "rb" );
-    if ( f == NULL) {//todo jury check
+    if ( f == NULL) {
         tl_t resp_header;
         resp_header.t = NOT_FOUND;
         resp_header.l = 0;
@@ -122,7 +119,7 @@ void cmd_get( tl_t header )
     snprintf( abs, 4000, "data/%s_%s", root_ctx->auth->uid, fname );
 
     FILE* f = fopen( abs, "rb" );
-    if ( f == NULL) {//todo jury check
+    if ( f == NULL) {
         tl_t resp_header;
         resp_header.t = NOT_FOUND;
         resp_header.l = 0;
@@ -199,7 +196,6 @@ void init( )
     root_ctx = allocator_alloc( sizeof( struct ctx_t ));
     bzero( root_ctx, sizeof( struct ctx_t ));
     strcpy( root_ctx->version, "kv8 version 4242" );
-    //todo use system in version
     root_ctx->iver = 4242;
     const char* s = getenv( "DEBUG" );
     if ( s != NULL && strcmp( "true", s ) == 0 ) {
@@ -210,12 +206,17 @@ void init( )
     }
     root_ctx->parent_ctx = root_ctx;
 }
-
+void timeout() {
+    firfirfir( "timeout" );
+}
 int main( )
 {
     init();
 
     for ( int i = 0; i <= 5; i++ ) {
+        signal(SIGALRM, timeout);
+        alarm(3);
+
         tl_t header = read_header();
         if ( header.t >= sizeof( handlers ) / sizeof( void* )) {
             firfirfir( "wrong command" );
