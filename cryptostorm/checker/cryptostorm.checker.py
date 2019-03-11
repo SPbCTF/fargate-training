@@ -41,7 +41,6 @@ def put(*args):
         if r.status_code != 200:
             close(CORRUPT, 'Status code is not 200')
 
-
         r = s.post("http://{}:{}/add".format(team_addr, PORT), {
             "name": name,
             "flag": flag,
@@ -63,13 +62,11 @@ def put(*args):
         if not flag in r.text:
             close(CORRUPT, "Can't add flag" )
 
-
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
         print(e)
         close(MUMBLE, "PUT Failed")
-
 
 
 def error_arg(*args):
