@@ -16,7 +16,7 @@ def generate_rand(N=16):
     return ''.join(random.choice(string.ascii_letters) for i in range(N))
 
 def generate_name():
-    return f"{generate_rand(4)}{generate_rand(3)}{generate_rand(4)}"
+    return f"{generate_rand(4)}-{generate_rand(3)}-{generate_rand(4)}"
 
 
 def close(code, public="", private=""):
