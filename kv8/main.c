@@ -146,6 +146,7 @@ void cmd_get( tl_t header )
 
 void cmd_quit( tl_t header )
 {
+//    fprintf(stderr, "cmd_quit");
     assert( header.l == 0 );
     char* msg = "goodby";
     tl_t resp_header;
@@ -214,7 +215,7 @@ int main( )
 {
     init();
 
-    for ( int i = 0; i < 5; i++ ) {
+    for ( int i = 0; i <= 5; i++ ) {
         tl_t header = read_header();
         if ( header.t >= sizeof( handlers ) / sizeof( void* )) {
             firfirfir( "wrong command" );

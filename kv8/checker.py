@@ -30,8 +30,8 @@ def cmd_auth(io, struid):
     packet = header1 + body
     io.send(packet)
     res = struct.unpack("LL", io.recv(16))
-    print "auth res ", res
-    return res;
+    # print "auth res ", res
+    return res
 
 
 def cmd_put(io, k, v):
@@ -65,12 +65,17 @@ def cmd_quit(io):
     packet = header1
     # open("auth")
     io.send(packet)
-    res = struct.unpack("LL", io.recv(16))
-    print "quit res ", res
+    recv = io.recv(16)
+    # print "reading header", hexdump(recv)
+    res = struct.unpack("LL", recv)
+    # print "quit res ", res
     l = res[1]
-    goodby = io.recv(l)
-    print "goodby", goodby
-    return res
+    if l != 0:
+        goodby = io.recv(l)
+    else:
+        goodby = None
+    # print "goodby", goodby
+    return [res[0], res[1], goodby]
 
 
 # def put("")
@@ -112,33 +117,29 @@ def exploit(host):
     io.interactive()
 
 
-class Status(enum.Enum):
-    OK      = 101
-    CORRUPT = 102
-    MUMBLE  = 103
-    DOWN    = 104
-    ERROR   = 110
+STATUS_OK      = 101
+STATUS_CORRUPT = 102
+STATUS_MUMBLE  = 103
+STATUS_DOWN    = 104
+STATUS_ERROR   = 110
 
 def quit(code, message=None):
-    if message is not None:
+    # print "quiting", code, message
+    if message is not None and code != STATUS_OK:
         print message
-    assert(type(code) == Status)
+    # assert(type(code) == Status)
     sys.exit(code)
 
 def connect(host):
-    if args.LOCAL:
-        io = process("./kv8")
+    try:
+        if args.LOCAL:
+            return process("./kv8")
+        else:
+            io = remote(host, PORT)
+            return io
+    except:
+        quit(STATUS_DOWN, "connection failed")
 
-        print io.pid
-        print "continue"
-        return io
-    else:
-        io = remote(host, PORT)
-        return io
-
-def info(host):
-    quit(Status.OK)
-    pass
 
 
 def randomid():
@@ -146,105 +147,88 @@ def randomid():
 
 
 def check(host):
-    try:
-        io = connect(host)
-    except:
-        quit(Status.DOWN, "connection failed")
-        return
+    # todo may be split into multiple connections
 
-    uid = randomid()
-    k = randomid()
-    v = randomid()
-    try:
-        res = cmd_auth(io, uid)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'auth failed')
+    with connect(host) as io:
+        uid = randomid()
+        k = randomid()
+        v = randomid()
+        try:
+            res = cmd_auth(io, uid)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'auth failed')
 
-        remote_value = cmd_get(io, k)
-        if remote_value is not None:
-            quit(Status.MUMBLE, 'could read value before it was put')
+            remote_value = cmd_get(io, k)
+            if remote_value is not None:
+                quit(STATUS_MUMBLE, 'could read value before it was put')
 
-        res = cmd_put(io, k, v)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'check-put failed')
+            res = cmd_put(io, k, v)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'check-put failed')
 
-        remote_value = cmd_get(io, k)
-        if remote_value is None:
-            quit(Status.MUMBLE, 'could not read value after put')
+            remote_value = cmd_get(io, k)
+            if remote_value is None:
+                quit(STATUS_MUMBLE, 'could not read value after put')
 
-        res = cmd_ping(io)
-        if "ping pong" not in res:
-            quit(Status.MUMBLE, 'ping pong failed')
+            res = cmd_ping(io)
+            if "ping pong" not in res:
+                quit(STATUS_MUMBLE, 'ping pong failed')
 
-        res = cmd_quit(io)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'check-quit failed')
-    except Exception as e:
-        quit(Status.MUMBLE, "exception " + str(type(e)))
+            res = cmd_quit(io)
+            # print res
+            if res[0] != 200 or res[1] == 0 or "goodby" not in res[2]:
+                quit(STATUS_MUMBLE, 'check-quit failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "exception " + str(type(e)))
 
-    try:
-        io.close()
-    except:
-        pass
-    quit(Status.OK)
+    quit(STATUS_OK)
 
 
 
 def flag_put(host, id, flag):
-    try:
-        io = connect(host)
-    except:
-        quit(Status.DOWN, "connection failed")
-        return
+    with connect(host) as io:
 
-    try:
-        res = cmd_auth(io, id)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'put auth failed')
+        try:
+            res = cmd_auth(io, id)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'put auth failed')
 
-        res = cmd_put(io, "flag", flag)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'put failed')
-    except Exception as e:
-        quit(Status.MUMBLE, "exception " + str(type(e)))
+            res = cmd_put(io, "flag", flag)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'put failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "exception " + str(type(e)))
 
-    try:
-        io = connect(host)
-    except:
-        quit(Status.DOWN, "connection failed")
-        return
-    try:
-        res = cmd_auth(io, id)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'put auth2 failed')
+    with connect(host) as io:
+        try:
+            res = cmd_auth(io, id)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'put auth2 failed')
 
-        remote_value = cmd_get(io, "flag")
-        if remote_value is None or remote_value != flag:
-            quit(Status.MUMBLE, 'could not read flag after put')
-        io.close()
-    except Exception as e:
-        quit(Status.MUMBLE, "exception " + str(type(e)))
-    quit(Status.OK)
+            remote_value = cmd_get(io, "flag")
+            if remote_value is None or remote_value != flag:
+                quit(STATUS_MUMBLE, 'could not read flag after put')
+            io.close()
+        except Exception as e:
+            quit(STATUS_MUMBLE, "exception " + str(type(e)))
+
+    quit(STATUS_OK)
 
 
 def flag_get(host, id, flag):
-    try:
-        io = connect(host)
-    except:
-        quit(Status.DOWN, "connection failed")
-        return
-    try:
-        res = cmd_auth(io, id)
-        if res[0] != 200 or res[1] != 0:
-            quit(Status.MUMBLE, 'put auth2 failed')
+    with connect(host) as io:
+        try:
+            res = cmd_auth(io, id)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'get auth2 failed')
 
-        remote_value = cmd_get(io, "flag")
-        if remote_value is None or remote_value != flag:
-            quit(Status.MUMBLE, 'could not read flag after put')
-        io.close()
-    except Exception as e:
-        quit(Status.MUMBLE, "exception " + str(type(e)))
-    quit(Status.OK)
+            remote_value = cmd_get(io, "flag")
+            if remote_value is None or remote_value != flag:
+                quit(STATUS_MUMBLE, 'could not read flag after put')
+            io.close()
+        except Exception as e:
+            quit(STATUS_MUMBLE, "exception " + str(type(e)))
+        quit(STATUS_OK)
 
 
 def main():
@@ -252,12 +236,12 @@ def main():
     # ./checker.py check 6.6.10.2
     # ./checker.py put 6.6.10.2 qweq-qweq-qweq ABCDEF1234567890ABCDEF123456789= 1
     # ./checker.py get 6.6.10.2 qweq-qweq-qweq ABCDEF1234567890ABCDEF123456789= 1
-    # self_file, action, args = argvv
+
     action = argvv[1]
     if action == 'exploit':
         exploit(argvv[2])
     if action == 'info':
-        quit(Status.OK)
+        quit(STATUS_OK)
     else:
         host = argvv[2]
         if action == 'check':
