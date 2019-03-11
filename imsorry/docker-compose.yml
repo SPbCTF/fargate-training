@@ -1,0 +1,9 @@
+version: "2.4"
+
+services:
+  imsorry:
+    build: .
+    ports:
+      - 4567:4567
+    volumes:
+      - ./db.sqlite:/usr/src/app/db.sqlite
