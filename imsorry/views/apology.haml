@@ -7,4 +7,10 @@
         %input{:type => "text", :name => "nickname_receiver", :placeholder => "Кому"}
         %input{:type => "text", :name => "private", :placeholder => "Приватно?(true|false)"}
         %input{:type => "submit", :value => "Отправить", :name => "submit"}
-      %textarea{:type => "text", :name => "apology_text", :placeholder => "Текст"}
+      %input{:type => "text", :name => "apology_text", :placeholder => "Текст"}
+    -if locals[:message]
+      .content Сообщение:
+      %b= locals[:message]
+    %div
+      %a{:href => "/"}
+        На главную

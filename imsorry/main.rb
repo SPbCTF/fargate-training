@@ -33,6 +33,10 @@ module ApplicationHelper
     end
   end
 
+  def list_users()
+    return Dir["./apology/*"].map{|user| user.split('/')[2].split('.')[0]}
+  end
+
 
   def new_user(username, password)
     if username.empty? or password.empty? or username =~ /[^A-Za-z0-9\-]/
@@ -58,14 +62,12 @@ class Auth_main < Sinatra::Base
   helpers ApplicationHelper
 
 
-  # Войти
   get '/login' do
     protected!
     redirect to("/")
   end
 
 
-  # Выйти
   get '/logout' do
     if authorized?
       status 401
@@ -76,15 +78,19 @@ class Auth_main < Sinatra::Base
     end
   end
 
+  get '/list_users' do 
+    forbidden!
+    list_users = list_users()
+    haml :users, :locals => {:list_users => list_users}
+  end
 
-  # Страница отправки извинения
+
     get '/apology' do
       forbidden!
       haml :apology
     end
 
 
-  # Поиск публичных извиненений по пользователю
   get '/apology/find' do
     forbidden!
     nickname_sender = params['nickname_sender']
@@ -103,7 +109,6 @@ class Auth_main < Sinatra::Base
   end
 
 
-  # # Прочитать извинение
   get '/apology/read' do
     forbidden!
     nickname_sender = params['nickname_sender']
@@ -114,7 +119,6 @@ class Auth_main < Sinatra::Base
   end
 
 
-  # Отправить извинение:публичное или приватное
   post '/apology' do
     forbidden!
     auth_cred ||=  get_cred()
@@ -124,6 +128,7 @@ class Auth_main < Sinatra::Base
     apology_text = params['apology_text']
     ap = Apology.new(nickname_sender)
     ap.add_to_user_apology(nickname_receiver, private, apology_text)
+    haml :apology, :locals => {:message => "Вы успешно извинились"}
   end
 
 end
@@ -133,25 +138,22 @@ class Main < Sinatra::Application
   disable :show_exceptions
   helpers ApplicationHelper
 
-  # Главная страница
+
   get '/' do
     haml :index
   end
 
 
-  # Ошибка с рандомным извинением
   error 404 do
     haml :error
   end
 
 
-  # Страница регистрации
   get '/register' do
     haml :register
   end
 
 
-  # Запрос на регистрацию
   post '/register' do
     username = params['username']
     password = params['password']
@@ -162,13 +164,3 @@ class Main < Sinatra::Application
     end
   end
 end
-
-# Действия чекера:
-# Чекер регистрирует пользователя для извинений aka test1
-# Регистируеет второго пользователя aka test2
-# Из под пользователя test2 извиняется перед test1 с пометкой 'Приватное извинение'
-
-# Проверка функциональности сервиса:
-# Регистрация
-# Авторизация 
-# Ошибка 404

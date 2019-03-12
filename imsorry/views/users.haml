@@ -1,0 +1,12 @@
+!!!
+%html
+  %body
+    %h1
+      Эти пользователи, которые уже извинились, а ты?
+    %table{:border => "1"} 
+      -locals[:list_users].each do |object|
+        %tr
+          %td= object
+    %div
+      %a{:href => "/"}
+        На главную

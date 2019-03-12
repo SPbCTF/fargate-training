@@ -5,14 +5,14 @@
       %div{:display => "inline"}
         %a{:href => "/logout"} Простите, я пошел
         %a{:href => "/apology"} ХОЧУ ИЗВИНИТЬСЯ
+        %a{:href => "/list_users"} Список пользователей
       .content Поиск извинений
       %form{:action => "/apology/find", :method => "get"}
         %div
           %input{:type => "text", :name => "nickname_sender", :placeholder => "Имя извиняющегося"}
           %input{:type => "submit", :value => "Отправить", :name => "submit"}
       -if locals[:result_find]
-        .content Результат поиска:
-        %b= locals[:nickname_sender]
+        .content Результат поиска по юзеру "#{locals[:nickname_sender]}"
         %table{:border => "1"} 
           %tr
             %td ID
@@ -22,13 +22,12 @@
               %td
                 %a{:href => "/apology/read?nickname_sender=#{locals[:nickname_sender]}&id=#{object[1]}"}= object[1]
               %td= object[0]
-      .content Публичные извинения, которое принесли прямо сейчас:
     -else
       %p 
         %a{:href => "/login"}Извините, можно войти?
       %p
         %a{:href => "/register"}Прошу прощения, меня зовут..
-    -if locals[:message]
+    -if locals[:message] and locals[:message] != ""
       .content Сообщение:
       %b= locals[:message]
       
