@@ -242,7 +242,7 @@ def main():
     action = argvv[1]
     if action == 'exploit':
         exploit(argvv[2])
-    if action == 'info':
+    elif  action == 'info':
         quit(STATUS_OK)
     else:
         host = argvv[2]

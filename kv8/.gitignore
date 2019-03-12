@@ -1,3 +1,4 @@
+libc.so.6
 data/*
 .idea/
 *build*/

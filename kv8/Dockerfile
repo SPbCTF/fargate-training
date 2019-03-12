@@ -1,18 +1,20 @@
-FROM alpine:3.9.2 AS builder
+FROM debian:buster-20190228-slim AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache gcc cmake build-base
+RUN apt-get update
+RUN apt-get install -y gcc cmake
 
 ADD . .
 
 RUN cmake . && cmake --build .
 
-FROM alpine:3.9.2
+FROM debian:buster-20190228-slim
 
 WORKDIR /app
 
-RUN apk add --no-cache socat
+RUN apt-get update
+RUN apt-get install -y socat
 
 COPY --from=builder /app/kv8 .
 
