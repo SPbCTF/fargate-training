@@ -1334,12 +1334,6 @@ def add():
 
 
 
-
-
-
-
-
-
 @app.route('/s3cr3t',methods=["G1MM3FL4G5?"])
 def s3cr3t():
 
