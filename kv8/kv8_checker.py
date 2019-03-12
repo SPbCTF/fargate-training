@@ -150,39 +150,77 @@ def randomid():
 
 
 def check(host):
-    # todo may be split into multiple connections
+
+
+    uid = randomid()
+    k = randomid()
+    v = randomid()
 
     with connect(host) as io:
-        uid = randomid()
-        k = randomid()
-        v = randomid()
+
         try:
             res = cmd_auth(io, uid)
             if res[0] != 200 or res[1] != 0:
                 quit(STATUS_MUMBLE, 'auth failed')
-
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check auth failed with exception " + str(type(e)))
+        try:
             remote_value = cmd_get(io, k)
             if remote_value is not None:
                 quit(STATUS_MUMBLE, 'could read value before it was put')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check get 1 exception " + str(type(e)))
 
+    with connect(host) as io:
+        try:
+            res = cmd_auth(io, uid)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'auth failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check auth failed with exception " + str(type(e)))
+        try:
             res = cmd_put(io, k, v)
             if res[0] != 200 or res[1] != 0:
                 quit(STATUS_MUMBLE, 'check-put failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check put failed with exception " + str(type(e)))
 
+    with connect(host) as io:
+        try:
+            res = cmd_auth(io, uid)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'auth failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check auth failed with exception " + str(type(e)))
+
+        try:
             remote_value = cmd_get(io, k)
             if remote_value is None:
                 quit(STATUS_MUMBLE, 'could not read value after put')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check get2  failed with exception " + str(type(e)))
 
+    with connect(host) as io:
+        try:
+            res = cmd_auth(io, uid)
+            if res[0] != 200 or res[1] != 0:
+                quit(STATUS_MUMBLE, 'auth failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "check auth failed with exception " + str(type(e)))
+        try:
             res = cmd_ping(io)
             if "ping pong" not in res:
                 quit(STATUS_MUMBLE, 'ping pong failed')
+        except Exception as e:
+            quit(STATUS_MUMBLE, "ping pong failed with exception " + str(type(e)))
 
+        try:
             res = cmd_quit(io)
             # print res
             if res[0] != 200 or res[1] == 0 or "goodby" not in res[2]:
                 quit(STATUS_MUMBLE, 'check-quit failed')
         except Exception as e:
-            quit(STATUS_MUMBLE, "exception " + str(type(e)))
+            quit(STATUS_MUMBLE, "quit failed with exception " + str(type(e)))
 
     quit(STATUS_OK)
 
@@ -227,7 +265,7 @@ def flag_get(host, id, flag):
 
             remote_value = cmd_get(io, "flag")
             if remote_value is None or remote_value != flag:
-                quit(STATUS_MUMBLE, 'could not read flag after put')
+                quit(STATUS_MUMBLE, 'could not read flag ')
             io.close()
         except Exception as e:
             quit(STATUS_MUMBLE, "exception " + str(type(e)))
