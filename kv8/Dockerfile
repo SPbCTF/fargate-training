@@ -1,14 +1,14 @@
-FROM alpine AS builder
+FROM alpine:3.9.2 AS builder
 
 WORKDIR /app
 
-ADD . .
-
 RUN apk add --no-cache gcc cmake build-base
+
+ADD . .
 
 RUN cmake . && cmake --build .
 
-FROM alpine
+FROM alpine:3.9.2
 
 WORKDIR /app
 

