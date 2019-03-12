@@ -7,14 +7,14 @@ module ApplicationHelper
 
   def forbidden!
     return if authorized?
-    halt 403, "Forbidden Error\n"
+    halt 403, "Только для извинённых\n"
   end
 
 
   def protected!
     return if authorized?
     headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-    halt 401, "Not authorized\n"
+    halt 401, "Зайди и извинись!\n"
   end
 
 
@@ -57,6 +57,7 @@ class Auth_main < Sinatra::Base
   disable :show_exceptions
   helpers ApplicationHelper
 
+
   # Войти
   get '/login' do
     protected!
@@ -75,6 +76,7 @@ class Auth_main < Sinatra::Base
     end
   end
 
+
   # Страница отправки извинения
     get '/apology' do
       forbidden!
@@ -83,26 +85,33 @@ class Auth_main < Sinatra::Base
 
 
   # Поиск публичных извиненений по пользователю
-  get '/apology' do
+  get '/apology/find' do
     forbidden!
     nickname_sender = params['nickname_sender']
     ap = Apology.new(nickname_sender)
+    message = ""
     if ap.check_exist_user(nickname_sender)
       res_ap = ap.get_public_apology()
     else
-      res_ap = ["Не сегодня"]
+      res_ap = []
+      message = "Не сегодня"
     end    
-    haml :index, :locals => {:result_find => res_ap}
+    haml :index, :locals => {:result_find => res_ap, 
+                              :nickname_sender => nickname_sender,
+                              :message => message}
   end
 
 
   # # Прочитать извинение
-  get '/apology' do
+  get '/apology/read' do
+    forbidden!
     nickname_sender = params['nickname_sender']
     id = params['id']
-    forbidden!
-    "apology"
+    ap = Apology.new(nickname_sender)
+    res_apology = ap.get_public_apology_id(id)
+    haml :read_apology, :locals => {:res_apology => res_apology}
   end
+
 
   # Отправить извинение:публичное или приватное
   post '/apology' do

@@ -2,19 +2,26 @@
 %html
   %body
     -if authorized?
-      %p
-        %a{:href => "/logout"}Простите, я пошел
+      %div{:display => "inline"}
+        %a{:href => "/logout"} Простите, я пошел
+        %a{:href => "/apology"} ХОЧУ ИЗВИНИТЬСЯ
       .content Поиск извинений
-      %form{:action => "/apology", :method => "get"}
+      %form{:action => "/apology/find", :method => "get"}
         %div
           %input{:type => "text", :name => "nickname_sender", :placeholder => "Имя извиняющегося"}
           %input{:type => "submit", :value => "Отправить", :name => "submit"}
       -if locals[:result_find]
         .content Результат поиска:
-        %table 
-          - locals[:result_find].each do |object|
+        %b= locals[:nickname_sender]
+        %table{:border => "1"} 
+          %tr
+            %td ID
+            %td NAME
+          -locals[:result_find].each do |object|
             %tr
-              %td= object
+              %td
+                %a{:href => "/apology/read?nickname_sender=#{locals[:nickname_sender]}&id=#{object[1]}"}= object[1]
+              %td= object[0]
       .content Публичные извинения, которое принесли прямо сейчас:
     -else
       %p 
@@ -23,5 +30,5 @@
         %a{:href => "/register"}Прошу прощения, меня зовут..
     -if locals[:message]
       .content Сообщение:
-      .content= locals[:message]
+      %b= locals[:message]
       

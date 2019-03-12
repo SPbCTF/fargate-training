@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<root>
-  <apologies>
-    <apology private="true" nickname_receiver="TEST1">
-      <apology_text>Sorry</apology_text>
-    </apology><apology private="true" nickname_receiver="TEST4"><apology_text>KEK_SORRY</apology_text></apology><apology private="true" nickname_receiver="TEST4"><apology_text>KEK_SORRY</apology_text></apology>
-
-  </apologies>
-</root>
