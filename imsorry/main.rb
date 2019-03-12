@@ -88,6 +88,7 @@ class Auth_main < Sinatra::Base
   get '/apology/find' do
     forbidden!
     nickname_sender = params['nickname_sender']
+    puts nickname_sender
     ap = Apology.new(nickname_sender)
     message = ""
     if ap.check_exist_user(nickname_sender)

