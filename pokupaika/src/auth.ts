@@ -43,7 +43,6 @@ export const jwtMiddleware = async (
 
     if (data) {
       req.user = data;
-      console.log(req.user);
     }
   }
   return /* thank u, */ next();
@@ -58,7 +57,7 @@ export const authRequired = async (
     return /* thx u authorized, */ next();
   } else {
     res.status(401);
-    res.json({ error: "Not authorized" });
+    res.render("401");
   }
 };
 

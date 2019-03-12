@@ -1,6 +1,5 @@
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 import { resolve } from "path";
@@ -14,7 +13,6 @@ export const startServer = (port: number) => {
 
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
-  // app.use(cors());
   app.use(morgan("dev"));
 
   app.all(
@@ -38,7 +36,24 @@ export const startServer = (port: number) => {
   app.get(
     "/",
     (req: Request, res: express.Response, next: express.NextFunction) => {
+      if (req.user) {
+        res.redirect("/zakupki");
+        return;
+      }
+
       res.render("index");
+    },
+  );
+
+  app.get(
+    "/login",
+    (req: Request, res: express.Response, next: express.NextFunction) => {
+      if (req.user) {
+        res.redirect("/zakupki");
+        return;
+      }
+
+      res.render("login");
     },
   );
 
@@ -57,13 +72,25 @@ export const startServer = (port: number) => {
       try {
         if ((token = await login(username, password))) {
           res.cookie("token", token as string);
-          res.json({ success: true, token });
+          res.redirect("/zakupki");
         } else {
           res.json({ success: false, error: "Wrong credentials" });
         }
       } catch (e) {
-        next(e);
+        return next(e);
       }
+    },
+  );
+
+  app.get(
+    "/register",
+    (req: Request, res: express.Response, next: express.NextFunction) => {
+      if (req.user) {
+        res.redirect("/zakupki");
+        return;
+      }
+
+      res.render("register");
     },
   );
 
@@ -82,12 +109,12 @@ export const startServer = (port: number) => {
 
         if ((token = await register(username, secret, password))) {
           res.cookie("token", token as string);
-          res.json({ success: true, token });
+          res.redirect("/");
         } else {
           res.json({ success: false, error: "User already registred" });
         }
       } catch (e) {
-        next(e);
+        return next(e);
       }
     },
   );
@@ -101,7 +128,7 @@ export const startServer = (port: number) => {
   );
 
   app.get("/me", authRequired, async (req: Request, res: express.Response) => {
-    res.json(req.user!);
+    res.render("me", { user: req.user });
   });
 
   app.get(
@@ -109,14 +136,14 @@ export const startServer = (port: number) => {
     authRequired,
     async (req: Request, res: express.Response) => {
       const zakupki = await redis.getAllZakupka();
-      res.json(zakupki);
+      res.render("zakupki", { zakupki });
     },
   );
 
   app.get(
     "/zakupka",
     authRequired,
-    async (req: Request, res: express.Response) => {
+    async (req: Request, res: express.Response, next: express.NextFunction) => {
       const { name } = req.query;
 
       if (!name) {
@@ -125,7 +152,13 @@ export const startServer = (port: number) => {
         return;
       }
 
-      const zakupka = await redis.getZakupka(name);
+      let zakupka;
+
+      try {
+        zakupka = await redis.getZakupka(name);
+      } catch (e) {
+        return next(e);
+      }
 
       if (!zakupka) {
         res.status(404);
@@ -133,12 +166,10 @@ export const startServer = (port: number) => {
         return;
       }
 
-      if (zakupka!.accessLevel === 0) {
-        res.json(zakupka);
-        return;
-      }
-
-      if (!req.user || req.user!.accessLevel !== zakupka!.accessLevel) {
+      if (
+        zakupka.owner !== req.user!.username &&
+        req.user!.accessLevel !== zakupka!.accessLevel
+      ) {
         res.json({
           success: false,
           error: "You don't have required acccessLevel!",
@@ -146,7 +177,15 @@ export const startServer = (port: number) => {
         return;
       }
 
-      res.json(zakupka);
+      res.render("zakupka", { zakupka });
+    },
+  );
+
+  app.get(
+    "/new",
+    authRequired,
+    (req: Request, res: express.Response, next: express.NextFunction) => {
+      res.render("new");
     },
   );
 
@@ -159,21 +198,42 @@ export const startServer = (port: number) => {
       if (!name || !description || !price || !accessLevel) {
         res.status(200);
         res.json({ success: false, error: "Not all fields provided!" });
+        return;
       }
 
       try {
+        if (await redis.existsZakupka(name)) {
+          res.json({ success: false, error: "Zakupka already exists!" });
+          return;
+        }
+
         await redis.createZakupka({
           name,
           description,
           price,
           accessLevel,
+          owner: req.user!.username,
         } as Zakupka);
       } catch (err) {
-        next(err);
+        return next(err);
       }
 
-      res.status(200);
-      res.json({ success: true });
+      res.redirect(`/zakupka?name=${name}`);
+    },
+  );
+
+  app.get(
+    "/new-users",
+    async (req: Request, res: express.Response, next: express.NextFunction) => {
+      let users;
+
+      try {
+        users = await redis.getAllUser();
+      } catch (e) {
+        return next(e);
+      }
+
+      res.render("users", { users });
     },
   );
 

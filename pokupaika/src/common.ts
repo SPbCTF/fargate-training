@@ -7,7 +7,7 @@ export interface Request extends ExpressRequest {
 export interface User {
   username: string;
   secret: string;
-  accessLevel?: number;
+  accessLevel: number;
   password: any;
 }
 
@@ -16,4 +16,5 @@ export interface Zakupka {
   description: string;
   price: number;
   accessLevel: number;
+  owner: string;
 }

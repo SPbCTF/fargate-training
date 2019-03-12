@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  main.pa4.vh-100.w-100
+    section.message-list.measure.center.v-mid
+      section.message.-left
+        i.nes-bcrikko
+        .nes-balloon.from-left
+          p Username:
+          p= user.username
+          p Secret:
+          p= user.secret
+          p Access level:
+          p= user.accessLevel

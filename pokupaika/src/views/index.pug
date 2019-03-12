@@ -4,23 +4,34 @@ block styles
     style= ".message {backgroud: transparent;}"
 
 block content
-  section(class="hero is-fullheight-with-navbar" style="background:url(https://source.unsplash.com/1920x1080/?market) no-repeat center;")
-    div(class="hero-head")
-      nav(class="navbar")
-          div(class="navbar-menu")
-            div(class="navbar-end")
-              div(class="navbar-item")
-                div(class="buttons")
-                  a(href="login" class="button nes-btn is-primary") Login
-                  a(href="register" class="button nes-btn is-success") Register 
-    div(class="hero-body")
-      div(class="container")
-        section(class="message-list")
-          section(class="message -left")
-            i(class="nes-bcrikko")
-            dev(class="nes-balloon from-left")
-              p= "Welcome to Pokupaika!"
-          section(class="message -right")
-            dev(class="nes-balloon from-right")
-              p= "It's the best service for making zakupkas!"       
-            i(class="nes-bcrikko")
+  //- section(class="hero is-fullheight-with-navbar" style="background:url(https://source.unsplash.com/PwCFHWmjoGg/1920x1080/) no-repeat center;")
+  //-   div(class="hero-head")
+  //-     nav(class="navbar")
+  //-         div(class="navbar-menu")
+  //-           div(class="navbar-end")
+  //-             div(class="navbar-item")
+  //-               div(class="buttons")
+  //-                 a(href="login" class="button nes-btn is-primary") Login
+  //-                 a(href="register" class="button nes-btn is-success") Register 
+  //-   div(class="hero-body")
+  //-     div(class="container")
+  //-       section(class="message-list")
+  //-         section(class="message -left")
+  //-           i(class="nes-bcrikko")
+  //-           dev(class="nes-balloon from-left")
+  //-             p= "Welcome to Pokupaika!"
+  //-         section(class="message -right")
+  //-           dev(class="nes-balloon from-right")
+  //-             p= "It's the best service for making zakupkas!"       
+  //-           i(class="nes-bcrikko")
+  
+
+  main.vh-100.w-100(style="background:url(https://source.unsplash.com/bTBjMeCsfkM/1920x1080/) no-repeat center;")
+    nav.pa3.pa4-ns
+      h1.dim.white.b.f1.f-headline-ns.tc.db.mb3.mb4-ns Pokupaika
+      h3.white.center Best SECURE service for publishing zakupkas and earing money by providing stuff for it.
+      .tc.pb3
+        a.link.dim.gold.f6.f5-ns.dib.mr3(href='zakupki', title='Zakupki') Zakupki
+        a.link.dim.gold.f6.f5-ns.dib.mr3(href='login', title='Login') Login
+        a.link.dim.gold.f6.f5-ns.dib.mr3(href='register', title='Register') Register
+        a.link.dim.gold.f6.f5-ns.dib(href='pubkey', title='Pubkey') Pubkey

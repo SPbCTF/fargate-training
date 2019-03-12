@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  main.pa4.black-80
+  form.measure.center(method="post")
+    fieldset#sign_up.ba.b--transparent.ph0.mh0
+      .mt3.nes-field
+        label.db.fw6.lh-copy.f6(for="username") Username
+        input#username.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type="text" name='username')
+      .mv3.nes-field
+        label.db.fw6.lh-copy.f6(for='password') Password
+        input#password.b.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type='password', name='password')
+    div
+      input.b.ph3.pv2.input-reset.ba.b--black.bg-transparent.grow.pointer.f6.dib.nes-btn(type='submit', value='Login')
+    .lh-copy.mt3
+      a.f6.link.dim.black.db(href='register') Register

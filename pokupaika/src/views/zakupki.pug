@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  main.measure-wide.center
+    h1 Zakupki!
+    p Tap to get more info and earn money!
+    ul.list.pa3.p10
+      each zakupka in zakupki
+        li.pv3.b--dotted
+          = "Name: "+zakupka.name
+          = " Price:"+zakupka.price
+          = " Level: "+zakupka.accessLevel
+          br
+          a.nes-btn(href="/zakupka?name="+zakupka.name) Info

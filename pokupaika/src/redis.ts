@@ -31,7 +31,7 @@ class Database {
 
   public async registerUser(user: User): Promise<void> {
     const { username, secret, accessLevel, password } = user;
-    console.log(`Password: ${password}`);
+    await this._redis.zadd("users", Date.now().toString(), username);
     await this.setUserFields(username, [
       "username",
       username,
@@ -44,25 +44,30 @@ class Database {
     ]);
   }
 
+  public async getAllUser(): Promise<string[] | undefined> {
+    const names = await this._redis.zrange("users", -30, -1);
+
+    return names;
+  }
+
   public async getZakupka(name: string): Promise<Zakupka | undefined> {
     return this._redis.hgetall(`zakupka:${name}`);
   }
 
   public async getAllZakupka(): Promise<Zakupka[] | undefined> {
-    const names = await this._redis.keys("zakupka:*");
-
-    console.log("names ", names);
+    const names = await this._redis.zrange("zakupki", -30, -1);
 
     const pipeline = await this._redis.pipeline();
-    names.forEach((name) => pipeline.hmget(name, "name", "money", "accessLevel"));
+    names.forEach((name: string) =>
+      pipeline.hmget(`zakupka:${name}`, "name", "money", "accessLevel"),
+    );
 
     const zakupki = (await pipeline.exec()).map((el: any) => ({
       name: el[1][0],
-      money: +el[1][1],
+      price: +el[1][1],
       accessLevel: +el[1][2],
     }));
 
-    console.log("zakupki", zakupki);
     return zakupki;
   }
 
@@ -70,9 +75,15 @@ class Database {
     await this._redis.hmset(`zakupka:${name}`, ...fields);
   }
 
+  public async existsZakupka(name: string): Promise<number | null> {
+    return await this._redis.exists(`zakupka:${name}`);
+  }
+
   public async createZakupka(zakupka: Zakupka): Promise<void> {
     const { name, description, price, accessLevel } = zakupka;
     await this.setZakupkaFields(name, [
+      "name",
+      name,
       "description",
       description,
       "price",
@@ -80,6 +91,7 @@ class Database {
       "accessLevel",
       accessLevel,
     ]);
+    await this._redis.zadd("zakupki", Date.now().toString(), name);
   }
 }
 
