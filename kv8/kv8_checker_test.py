@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import subprocess
 import sys
 import os
@@ -24,10 +25,10 @@ def randomid():
 while True:
 	uid = randomid()
 	flag = randomid()
-	r1 = check("python checker.py info", "info")
-	r2 = check("python checker.py check " + host, "check")
-	r3 = check("python checker.py put " + host + " " + uid + " " + flag, "put")
-	r4 = check("python checker.py get " + host + " " + uid + " " + flag, "get")
+	r1 = check("python kv8_checker.py info", "info")
+	r2 = check("python kv8_checker.py check " + host, "check")
+	r3 = check("python kv8_checker.py put " + host + " " + uid + " " + flag, "put")
+	r4 = check("python kv8_checker.py get " + host + " " + uid + " " + flag, "get")
 	if r1 and r2 and r3 and r4:
 		print "ALL GODD"
 	else:

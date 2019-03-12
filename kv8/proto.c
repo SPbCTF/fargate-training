@@ -91,6 +91,8 @@ void check_path_part( const char* s )
             continue;
         } else if ( c >= '0' && c <= '9' ) {
             continue;
+        } else if ( c == '-' ) {
+            continue;
         } else {
             firfirfir( "bad uid" );
         }
