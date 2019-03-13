@@ -1,0 +1,10 @@
+version: "2.4"
+
+services:
+  kv8:
+    build: .
+    ports:
+      - 4242:4242
+    volumes:
+      - ./data:/app/data
+    restart: always
