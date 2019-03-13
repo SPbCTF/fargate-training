@@ -1,0 +1,9 @@
+version: "2.4"
+
+services:
+  cryptostorm:
+    build: .
+    volumes:
+      - ./flags.sqlite:/cryptostorm/flags.sqlite
+    ports:
+      - 22228:22228
