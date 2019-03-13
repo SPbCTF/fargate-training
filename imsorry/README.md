@@ -2,15 +2,15 @@
 
 Собрать:
 ```
-docker build -t imsorry_image .
+docker-compse build
 ```
 
 Поднять:
 ```
-docker run -p 4567:4567 -it --name imsorry_service imsorry_image rackup -o 0.0.0.0 -p 4567
+docker-compose up
 ```
 
 Заходим на:
 ```
-http://127.0.0.1:4567/
+http://127.0.0.1:14567/
 ```
