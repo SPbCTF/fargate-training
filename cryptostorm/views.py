@@ -14,7 +14,7 @@ def index():
 @app.route('/flags')
 def show():
 
-    sql = 'SELECT id, name, method, public FROM flags ORDER BY id DESC'
+    sql = 'SELECT id, name, method, public FROM flags ORDER BY id DESC LIMIT 500'
     flags_db = database.query(sql)
 
     flags = [dict(flags_db[i]) for i in range(len(flags_db))]
