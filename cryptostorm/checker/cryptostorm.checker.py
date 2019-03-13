@@ -19,6 +19,74 @@ methods = {0: "SHA-1", 1: "SHA-2", 2: "Keccak", 3: "PRNG", 4: "RSA", 5: "AES"}
 methods_inv = {v: k for k, v in methods.items()}
 
 
+# Yeah, fuck imports
+class HTMLTableParser(HTMLParser):
+    # https://github.com/schmijos/html-table-parser-python3/blob/master/html_table_parser/parser.py
+    """ This class serves as a html table parser. It is able to parse multiple
+    tables which you feed in. You can access the result per .tables field.
+    """
+
+    def __init__(
+            self,
+            decode_html_entities=False,
+            data_separator=' ',
+    ):
+
+        HTMLParser.__init__(self)
+
+        self._parse_html_entities = decode_html_entities
+        self._data_separator = data_separator
+
+        self._in_td = False
+        self._in_th = False
+        self._current_table = []
+        self._current_row = []
+        self._current_cell = []
+        self.tables = []
+
+    def handle_starttag(self, tag, attrs):
+        """ We need to remember the opening point for the content of interest.
+        The other tags (<table>, <tr>) are only handled at the closing point.
+        """
+        if tag == 'td':
+            self._in_td = True
+        if tag == 'th':
+            self._in_th = True
+
+    def handle_data(self, data):
+        """ This is where we save content to a cell """
+        if self._in_td or self._in_th:
+            self._current_cell.append(data.strip())
+
+    def handle_charref(self, name):
+        """ Handle HTML encoded characters """
+
+        if self._parse_html_entities:
+            self.handle_data(self.unescape('&#{};'.format(name)))
+
+    def handle_endtag(self, tag):
+        """ Here we exit the tags. If the closing tag is </tr>, we know that we
+        can save our currently parsed cells to the current table as a row and
+        prepare for a new row. If the closing tag is </table>, we save the
+        current table and prepare for a new one.
+        """
+        if tag == 'td':
+            self._in_td = False
+        elif tag == 'th':
+            self._in_th = False
+
+        if tag in ['td', 'th']:
+            final_cell = self._data_separator.join(self._current_cell).strip()
+            self._current_row.append(final_cell)
+            self._current_cell = []
+        elif tag == 'tr':
+            self._current_table.append(self._current_row)
+            self._current_row = []
+        elif tag == 'table':
+            self.tables.append(self._current_table)
+            self._current_table = []
+
+
 def generate_rand(N=16):
     return ''.join(random.choice(string.ascii_lowercase) for _ in range(N))
 
@@ -89,41 +157,46 @@ def check(*args):
     team_addr = args[0]
 
     s = requests.Session()
-    try:
-        r = s.get("http://{}:{}/".format(team_addr, PORT))
 
-        name, method, flag = generate_name(), random.choice([0,1,2,3,4,5]), generate_rand(32)
-        print(f"Username:{name}")
-        print(f"Algorythm: {methods[method]}")
+    for method in range(len(methods)):
 
-        if r.status_code != 200:
-            close(CORRUPT, 'Status code is not 200')
+        try:
+            r = s.get("http://{}:{}/".format(team_addr, PORT))
 
-        r = s.post("http://{}:{}/add".format(team_addr, PORT), {
-            "name": name,
-            "flag": flag,
-            "method": str(method)
-        })
+            name, flag = generate_name(), generate_rand(32)
+            print(f"Username:{name}")
+            print(f"Algorythm: {methods[method]}")
 
-        if r.status_code != 200:
-            close(MUMBLE, "Can't add flag")
+            if r.status_code != 200:
+                close(CORRUPT, 'Status code is not 200')
 
-        private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-        print(f"private_key: {private_key}")
-        flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-        print(f"Flag identifier: {flag_identifier}")
+            r = s.post("http://{}:{}/add".format(team_addr, PORT), {
+                "name": name,
+                "flag": flag,
+                "method": str(method)
+            })
 
-        r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
-            "private": private_key
-        })
+            if r.status_code != 200:
+                close(MUMBLE, "Can't add flag")
 
-        if not flag in r.text:
-            close(CORRUPT, "Can't decrypt flag")
+            private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
+            print(f"private_key: {private_key}")
+            flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
+            print(f"Flag identifier: {flag_identifier}")
 
-        close(OK)
+            r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
+                "private": private_key
+            })
 
-    except Exception as e:
-        close(MUMBLE)
+            if not flag in r.text:
+                close(CORRUPT, "Can't decrypt flag")
+
+            check_storage(team_addr, PORT, flag_identifier, private_key, flag)
+
+        except Exception as e:
+            close(MUMBLE)
+
+    close(OK)
 
 
 def get(*args):
@@ -140,9 +213,9 @@ def get(*args):
         if flag not in r.text:
             close(CORRUPT, "Can't decrypt flag")
 
-        close(OK, "{}:{}".format(flag_identifier, private_key))
+        check_storage(team_addr, PORT, flag_identifier, private_key, flag)
 
-        check_storage(team_addr, flag_identifier, private_key, flag)
+        close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
         close(CORRUPT)
@@ -213,8 +286,7 @@ def check_public(method, public, private, flag):
 
     if not res:
         close(CORRUPT, f'Check of public key on flags page failed for method {methods[method]}')
-    else:
-        close(OK, f"{methods[method]} check successful")
+
 
 
 def get_private_key(password):
@@ -266,20 +338,23 @@ def RSA_decrypt(d, n, message, flag):
     return Decryption(d, n, message) == flag
 
 
-def check_storage(team_addr, id, private, flag: "Only required for AES and RSA" = ''):
+def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and RSA" = ''):
     try:
         r = requests.get(f"http://{team_addr}:{PORT}/flags")
-    except:
+    except Exception as e:
         close(CORRUPT, "Request for /flags failed")
 
     html = r.text
+
     try:
         data = parse_table(html)
-    except:
+    except Exception as e:
         close(CORRUPT, "Parsing table on /flags page failed")
 
     try:
+        id = int(id)
         entry = data[id]
+
     except:
         close(CORRUPT, f"No data for id {id} found")
 
@@ -290,8 +365,11 @@ def check_storage(team_addr, id, private, flag: "Only required for AES and RSA" 
     public = entry['Открытый ключ']
 
     try:
+        public = str(public)
+        private = str(private)
         check_public(method, public, private, flag)
-    except:
+    except Exception as e:
+       # print (e)
         close(CORRUPT, f"Public key check failed for id {id}")
 
 
@@ -301,70 +379,3 @@ if __name__ == '__main__':
     except Exception as ex:
         close(CHECKER_ERROR, private="INTERNAL ERROR: {}".format(ex))
 
-
-# Yeah, fuck imports
-class HTMLTableParser(HTMLParser):
-    # https://github.com/schmijos/html-table-parser-python3/blob/master/html_table_parser/parser.py
-    """ This class serves as a html table parser. It is able to parse multiple
-    tables which you feed in. You can access the result per .tables field.
-    """
-
-    def __init__(
-            self,
-            decode_html_entities=False,
-            data_separator=' ',
-    ):
-
-        HTMLParser.__init__(self)
-
-        self._parse_html_entities = decode_html_entities
-        self._data_separator = data_separator
-
-        self._in_td = False
-        self._in_th = False
-        self._current_table = []
-        self._current_row = []
-        self._current_cell = []
-        self.tables = []
-
-    def handle_starttag(self, tag, attrs):
-        """ We need to remember the opening point for the content of interest.
-        The other tags (<table>, <tr>) are only handled at the closing point.
-        """
-        if tag == 'td':
-            self._in_td = True
-        if tag == 'th':
-            self._in_th = True
-
-    def handle_data(self, data):
-        """ This is where we save content to a cell """
-        if self._in_td or self._in_th:
-            self._current_cell.append(data.strip())
-
-    def handle_charref(self, name):
-        """ Handle HTML encoded characters """
-
-        if self._parse_html_entities:
-            self.handle_data(self.unescape('&#{};'.format(name)))
-
-    def handle_endtag(self, tag):
-        """ Here we exit the tags. If the closing tag is </tr>, we know that we
-        can save our currently parsed cells to the current table as a row and
-        prepare for a new row. If the closing tag is </table>, we save the
-        current table and prepare for a new one.
-        """
-        if tag == 'td':
-            self._in_td = False
-        elif tag == 'th':
-            self._in_th = False
-
-        if tag in ['td', 'th']:
-            final_cell = self._data_separator.join(self._current_cell).strip()
-            self._current_row.append(final_cell)
-            self._current_cell = []
-        elif tag == 'tr':
-            self._current_table.append(self._current_row)
-            self._current_row = []
-        elif tag == 'table':
-            self.tables.append(self._current_table)
-            self._current_table = []
