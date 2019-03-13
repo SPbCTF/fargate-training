@@ -6,7 +6,7 @@ import re
 from base64 import b64encode
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
-SERVICENAME = "imsorry"
+SERVICENAME = "Z"
 PORT = 14567
 url = "http://{}:14567"
 alph = ascii_lowercase + digits

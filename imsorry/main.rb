@@ -22,6 +22,9 @@ module ApplicationHelper
       return Rack::Auth::Basic::Request.new(request.env)
     end
 
+  def get_top10()
+    return List_apology.all(:limit => 10)
+  end
 
   def authorized?
     @auth ||=  get_cred()
@@ -53,7 +56,20 @@ module ApplicationHelper
       end
     end
   end
-  
+
+  def new_apology_top(username_sender, username_receiver)
+    begin  
+      apology = List_apology.new(:username_sender => username_sender, :username_receiver => username_receiver)
+      apology.save
+    rescue DataObjects::IntegrityError => msg
+      if msg.message.include? "UNIQUE constraint failed"
+        return false
+      else
+        return true
+      end
+    end
+  end
+
 end
 
 
@@ -148,6 +164,9 @@ class Auth_main < Sinatra::Base
     apology_text = params['apology_text']
     ap = Apology.new(nickname_sender)
     ap.add_to_user_apology_crutch(nickname_receiver, private, apology_text)
+    if private == "false"
+      new_apology_top(nickname_sender, nickname_receiver)
+    end
     haml :apology, :locals => {:message => "Вы успешно извинились"}
   end
 
@@ -160,7 +179,12 @@ class Main < Sinatra::Application
 
 
   get '/' do
-    haml :index
+    # get_top10.each do |i| 
+      # puts i.username_sender
+      # puts i.username_receiver
+    # end 
+    # haml :index
+    haml :index, :locals => {:top10 => get_top10()}
   end
 
 

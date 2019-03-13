@@ -19,5 +19,12 @@ class User
   end
 end
 
+class List_apology
+  include DataMapper::Resource
+  property :id, Serial, :key => true
+  property :username_sender, String  
+  property :username_receiver, String
+end
+
 DataMapper.finalize
 DataMapper.auto_upgrade!

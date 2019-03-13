@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE qwe2 PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<root>
+  <apologies direction="out">
+    <apology id="9IQmLWYozg" private="false" nickname="qwe">
+      <apology_text>asd</apology_text>
+    </apology>
+    <apology id="CYnq2XJUaT" private="true" nickname="qwe">
+      <apology_text>asdd</apology_text>
+    </apology>
+  <apology id="5RrebIJ2jA" private="false" nickname="qwe"><apology_text>zxczx</apology_text></apology><apology id="ZkAicRG18J" private="true" nickname="qwe"><apology_text>FLAG</apology_text></apology></apologies>
+  <apologies direction="in"/>
+</root>

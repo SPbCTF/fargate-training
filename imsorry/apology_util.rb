@@ -130,3 +130,6 @@ class Apology
   end
   
 end
+
+# ap = Apology.new("admin")
+# ap.

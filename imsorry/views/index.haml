@@ -30,4 +30,18 @@
     -if locals[:message] and locals[:message] != ""
       .content Сообщение:
       %b= locals[:message]
-      
+
+    -if locals[:top10] and locals[:top10] != ""
+      Топ 10 извинений:
+      %table{:border => "1"} 
+        %tr
+          %td NAME
+          %td
+          %td NAME
+        -locals[:top10].each do |i| 
+          %tr
+            %td= i.username_sender
+            %td
+              \=>
+            %td= i.username_receiver
+        
