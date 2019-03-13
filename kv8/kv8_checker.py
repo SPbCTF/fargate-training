@@ -16,9 +16,9 @@ def cmd_ping(io, leak=0):
     header1 = struct.pack("L", CMD_PING) + struct.pack("L", len(ping) + 1)
     packet1 = header1 + ping + "\x00"
     io.send(packet1)
-    respheader = struct.unpack("LL", io.recv(16))
+    respheader = struct.unpack("LL", io.recvn(16))
     l = respheader[1]
-    return io.recv(l)
+    return io.recvn(l)
 
 
 def cmd_auth(io, struid):
@@ -30,7 +30,7 @@ def cmd_auth(io, struid):
     header1 = struct.pack("L", CMD) + struct.pack("L", len(body))
     packet = header1 + body
     io.send(packet)
-    res = struct.unpack("LL", io.recv(16))
+    res = struct.unpack("LL", io.recvn(16))
     # print "auth res ", res
     return res
 
@@ -41,7 +41,7 @@ def cmd_put(io, k, v):
     header1 = struct.pack("L", CMD) + struct.pack("L", len(body))
     packet = header1 + body
     io.send(packet)
-    res = struct.unpack("LL", io.recv(16))
+    res = struct.unpack("LL", io.recvn(16))
     return res
 
 
@@ -51,10 +51,10 @@ def cmd_get(io, k):
     header1 = struct.pack("L", CMD) + struct.pack("L", len(body))
     packet = header1 + body
     io.send(packet)
-    res = struct.unpack("LL", io.recv(16))
+    res = struct.unpack("LL", io.recvn(16))
     if res[0] == 200:
         l = res[1]
-        return io.recv(l)
+        return io.recvn(l)
     else:
         return None
 
@@ -66,13 +66,13 @@ def cmd_quit(io):
     packet = header1
     # open("auth")
     io.send(packet)
-    recv = io.recv(16)
+    recv = io.recvn(16)
     # print "reading header", hexdump(recv)
     res = struct.unpack("LL", recv)
     # print "quit res ", res
     l = res[1]
     if l != 0:
-        goodby = io.recv(l)
+        goodby = io.recvn(l)
     else:
         goodby = None
     # print "goodby", goodby
@@ -209,7 +209,7 @@ def check(host):
             quit(STATUS_MUMBLE, "check auth failed with exception " + str(type(e)))
         try:
             res = cmd_ping(io)
-            if "ping pong" not in res:
+            if "ping pong kv8 version 4242" not in res:
                 quit(STATUS_MUMBLE, 'ping pong failed')
         except Exception as e:
             quit(STATUS_MUMBLE, "ping pong failed with exception " + str(type(e)))
