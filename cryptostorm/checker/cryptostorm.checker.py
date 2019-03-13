@@ -50,9 +50,9 @@ def put(*args):
         if r.status_code != 200:
             close(MUMBLE, "Can't add flag")
 
-        private_key = re.findall(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text)[0]
+        private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
         print(f"private_key: {private_key}")
-        flag_identifier = re.findall(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text)[0]
+        flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
         print(f"Flag identifier: {flag_identifier}")
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
@@ -95,15 +95,15 @@ def check(*args):
         r = s.post("http://{}:{}/add".format(team_addr, PORT), {
             "name": name,
             "flag": flag,
-            "method" : str(method)
+            "method": str(method)
         })
 
         if r.status_code != 200:
             close(MUMBLE, "Can't add flag")
 
-        private_key = re.findall(r'хранилища:</a></p><h4 class="lead text-muted">.*</h4>', r.text)[0][46:-5]
+        private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
         print(f"private_key: {private_key}")
-        flag_identifier = re.findall(r'Ваш уникальный идентификатор флага: .*</p><', r.text)[0][36:-5]
+        flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
         print(f"Flag identifier: {flag_identifier}")
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
