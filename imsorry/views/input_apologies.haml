@@ -1,0 +1,18 @@
+!!!
+%html
+  %body
+    %h1
+      Входящие извинения
+    %table{:border => "1"} 
+      %tr
+        %td ID
+        %td NAME
+        %td PRIVATE
+        %td TEXT
+      -locals[:res_apologies].each do |object|
+        %tr
+          %td
+            %a{:href => "/apology/read_private?id=#{object[0]}"}= object[0]
+          %td= object[1]
+          %td= object[2]
+          %td= object[3]

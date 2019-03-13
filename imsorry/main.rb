@@ -7,14 +7,14 @@ module ApplicationHelper
 
   def forbidden!
     return if authorized?
-    halt 403, "Только для извинённых\n"
+    halt 403, "Только для извинённых\n<div><a href='/'>На главную</a></div>"
   end
 
 
   def protected!
     return if authorized?
     headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-    halt 401, "Зайди и извинись!\n"
+    halt 401, "Зайди и извинись!\n<div><a href='/'>На главную</a></div>"
   end
 
 
@@ -77,18 +77,24 @@ class Auth_main < Sinatra::Base
       haml :logout, :locals => {:message => "Вы уже успешно попрощались\n"}
     end
   end
+  
 
-  get '/list_users' do 
-    forbidden!
-    list_users = list_users()
-    haml :users, :locals => {:list_users => list_users}
+  get '/input_apologies' do
+    auth_cred ||=  get_cred()
+    nickname_sender = auth_cred.credentials[0]
+    ap = Apology.new(nickname_sender)
+    if ap.check_exist_user(nickname_sender)
+      res_apologies = ap.get_input_apology()
+    else
+      res_apologies = []
+    end
+    haml :input_apologies, :locals => {:res_apologies => res_apologies}
   end
 
-
-    get '/apology' do
-      forbidden!
-      haml :apology
-    end
+  get '/apology' do
+    forbidden!
+    haml :apology
+  end
 
 
   get '/apology/find' do
@@ -114,10 +120,24 @@ class Auth_main < Sinatra::Base
     nickname_sender = params['nickname_sender']
     id = params['id']
     ap = Apology.new(nickname_sender)
-    res_apology = ap.get_public_apology_id(id)
+    res_apology = ap.get_public_apology_out_text_by_id(id)
     haml :read_apology, :locals => {:res_apology => res_apology}
   end
 
+
+  get '/apology/read_private' do
+    forbidden!
+    auth_cred ||=  get_cred()
+    nickname_sender = auth_cred.credentials[0]
+    ap = Apology.new(nickname_sender)
+    if ap.check_exist_user(nickname_sender)
+      id = params['id']
+      res_apology = ap.get_private_apology_out_text_by_id(id)
+    else
+      res_apology = ""
+    end
+    haml :read_apology, :locals => {:res_apology => res_apology}
+  end
 
   post '/apology' do
     forbidden!
@@ -127,7 +147,7 @@ class Auth_main < Sinatra::Base
     private = params['private']
     apology_text = params['apology_text']
     ap = Apology.new(nickname_sender)
-    ap.add_to_user_apology(nickname_receiver, private, apology_text)
+    ap.add_to_user_apology_crutch(nickname_receiver, private, apology_text)
     haml :apology, :locals => {:message => "Вы успешно извинились"}
   end
 
@@ -145,7 +165,7 @@ class Main < Sinatra::Application
 
 
   error 404 do
-    haml :error
+    haml :error, :locals => {:message => "Не нашлось"}
   end
 
 

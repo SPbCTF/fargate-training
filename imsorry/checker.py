@@ -3,13 +3,14 @@ from random import choice
 import sys
 import requests as rq
 import re
+from base64 import b64encode
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "imsorry"
 PORT = 14567
 url = "http://{}:14567"
 alph = ascii_lowercase + digits
-def gen_random_string(N=4):
+def gen_random_string(N=5):
 	return "".join(choice(alph) for i in range(N))
 
 def gen_login():
@@ -20,14 +21,16 @@ def gen_password():
 	# 86ai95iig90cns
 	return gen_random_string(14)
 
-def register(team_addr):
-	username = gen_login()
-	password = gen_password()
+def create_headers(username, password):
+	auth_string = b64encode("{}:{}".format(username, password).encode()).decode()
+	headers = {"Authorization":"Basic {}".format(auth_string)}
+	return headers
+
+def register(team_addr, username=gen_login(), password=gen_password()):
 	res = rq.post(url.format(team_addr)+"/register", data={"username":username,
 											"password":password})
-	print(res.text)
-	if not re.findall(r"{}".format(username), res):
-		close(MUMBLE, "Not see message after register!")
+	if not re.findall(r"{}".format(username), res.text):
+		close(MUMBLE, private="Not see message after register!")
 	return username, password
 
 def close(code, public="", private=""):
@@ -43,14 +46,31 @@ def info(*args):
 
 def check(*args):
 	team_addr = args[0]
+	# ################################
+	close(OK)
 
 def put(*args):
 	team_addr, flag_id, flag = args[:3]
 	username, password = register(team_addr)
-
+	username2 = gen_login()
+	password2 = gen_password()
+	headers = create_headers(username, password)
+	data = {"nickname_receiver":username2,
+			"private":"true",
+			"apology_text":flag}
+	res = rq.post(url.format(team_addr)+"/apology", headers=headers, data=data)
+	if not re.findall(r"Вы успешно извинились", res.text):
+		close(MUMBLE, "Not see message after send apology!")
+	close(OK,"{}:{}".format(username2,password2))
 
 def get(*args):
 	team_addr, lpb, flag = args[:3]
+	username, password = lpb.split(":")
+	_,_ = register(team_addr, username, password)
+	headers = create_headers(username, password)
+	res = rq.get(url.format(team_addr)+"/input_apologies", headers=headers)
+	if flag in res.text:
+		close(OK)
 
 def error_arg(*args):
     close(CHECKER_ERROR, private="Wrong command {}".format(sys.argv[1]))
@@ -78,8 +98,11 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    register("127.0.0.1")
+    main()
+    # gen_flag = gen_random_string(31)+"="
+    # print(gen_flag)
+    # put("127.0.0.1",gen_login(),gen_flag)
+    # get("127.0.0.1","vk5k1-q5atz-5jhcd:vi0yqn07viawnn","l8adaffdgt8qftmlj4d43kkfizobd7e=")
     # pass
 
 # Действия чекера:
