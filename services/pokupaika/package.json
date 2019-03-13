@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "copy": "cp secrets/private.pem secrets/public.pem dist/secrets/ && cp .env dist/.env",
+    "copy": "cp secrets/private.pem secrets/public.pem dist/secrets/ && cp .env dist/.env && mkdir -p dist/src/views && cp src/views/* dist/src/views/",
     "dev": "NODE_ENV=development tsnd --respawn index.ts",
     "build": "tsc",
     "dist": "yarn build && yarn copy",
