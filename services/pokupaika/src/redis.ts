@@ -80,7 +80,7 @@ class Database {
   }
 
   public async createZakupka(zakupka: Zakupka): Promise<void> {
-    const { name, description, price, accessLevel } = zakupka;
+    const { name, description, price, accessLevel, owner } = zakupka;
     await this.setZakupkaFields(name, [
       "name",
       name,
@@ -90,6 +90,8 @@ class Database {
       price,
       "accessLevel",
       accessLevel,
+      "owner",
+      owner
     ]);
     await this._redis.zadd("zakupki", Date.now().toString(), name);
   }
