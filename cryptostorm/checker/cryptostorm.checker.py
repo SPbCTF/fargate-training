@@ -13,10 +13,10 @@ PORT = 5000
 methods = {0: "SHA-1", 1: "SHA-2", 2: "Keccak", 3: "PRNG", 4: "RSA", 5: "AES"}
 
 def generate_rand(N=16):
-    return ''.join(random.choice(string.ascii_letters) for i in range(N))
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(N))
 
 def generate_name():
-    return f"{generate_rand(4)}-{generate_rand(3)}-{generate_rand(4)}"
+    return f"{generate_rand(4)}-{generate_rand(4)}-{generate_rand(4)}"
 
 
 def close(code, public="", private=""):
@@ -34,7 +34,7 @@ def put(*args):
     try:
         r = s.get("http://{}:{}/".format(team_addr, PORT))
 
-        name, method = generate_name(), random.choice([0,1,2,3,4,5])
+        name, method = generate_name(), random.choice(range(len(methods)))
         print(f"Username:{name}")
         print(f"Algorythm: {methods[method]}")
 
@@ -50,9 +50,9 @@ def put(*args):
         if r.status_code != 200:
             close(MUMBLE, "Can't add flag")
 
-        private_key = re.findall(r'хранилища:</a></p><h4 class="lead text-muted">.*</h4>', r.text)[0][46:-5]
+        private_key = re.findall(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text)[0]
         print(f"private_key: {private_key}")
-        flag_identifier = re.findall(r'Ваш уникальный идентификатор флага: .*</p><', r.text)[0][36:-5]
+        flag_identifier = re.findall(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text)[0]
         print(f"Flag identifier: {flag_identifier}")
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
@@ -111,7 +111,7 @@ def check(*args):
         })
 
         if not flag in r.text:
-            close(CORRUPT, "Can't decrypt flag" )
+            close(CORRUPT, "Can't decrypt flag")
 
 
         close(OK)
