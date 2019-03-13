@@ -1,5 +1,0 @@
-libc.so.6
-data/*
-.idea/
-*build*/
-.DS_Store
