@@ -156,7 +156,7 @@ def main():
     try:
 	    COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
     except Exception as ex:
-        close(CHECKER_ERROR, private="INTERNAL ERROR:\n{}".format(print_exc))
+        close(CHECKER_ERROR, private="INTERNAL ERROR:\n{}".format(print_exc()))
 
 
 if __name__ == "__main__":
