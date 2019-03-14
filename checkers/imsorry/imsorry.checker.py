@@ -8,6 +8,7 @@ import sys
 import requests as rq
 import re
 from base64 import b64encode
+from traceback import print_exc
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "Z"
@@ -152,10 +153,10 @@ COMMANDS = {
 }
 
 def main():
-    # try:
-    COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
-    # except Exception as ex:
-        # close(CHECKER_ERROR, private="INTERNAL ERROR: {}".format(ex))
+    try:
+	    COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
+    except Exception as ex:
+        close(CHECKER_ERROR, private="INTERNAL ERROR:\n{}".format(print_exc))
 
 
 if __name__ == "__main__":
