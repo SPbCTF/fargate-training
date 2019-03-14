@@ -1,4 +1,8 @@
-from string import  ascii_lowercase, digits
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function
+from string import  ascii_letters
 from random import choice
 import sys
 import requests as rq
@@ -9,27 +13,30 @@ OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "Z"
 PORT = 14567
 url = "http://{}:14567"
-alph = ascii_lowercase + digits
 def gen_random_string(N=5):
-	return "".join(choice(alph) for i in range(N))
+	return "".join(choice(ascii_letters) for i in range(N))
 
 def gen_login():
-	# yzm9-g7bt-pb23
-	return "{}-{}-{}".format(gen_random_string(),gen_random_string(),gen_random_string())
+	return gen_random_string(12)
 
 def gen_password():
-	# 86ai95iig90cns
 	return gen_random_string(14)
 
 def create_headers(username, password):
-	auth_string = b64encode("{}:{}".format(username, password).encode()).decode()
+	auth_string = b64encode("{}:{}".format(username, password))
 	headers = {"Authorization":"Basic {}".format(auth_string)}
 	return headers
 
-def register(team_addr, username=gen_login(), password=gen_password()):
-	res = rq.post(url.format(team_addr)+"/register", data={"username":username,
+def register(team_addr,username="",password=""):
+	if not username and not password:
+		username = gen_login()
+		password = gen_password()
+	try:
+		res = rq.post(url.format(team_addr)+"/register", data={"username":username,
 											"password":password})
-	if not re.findall(r"{}".format(username), res.text):
+	except rq.exceptions.ConnectionError:
+		close(DOWN)
+	if not username in res.text:
 		close(MUMBLE, private="Not see message after register!")
 	return username, password
 
@@ -46,7 +53,51 @@ def info(*args):
 
 def check(*args):
 	team_addr = args[0]
-	# ################################
+	username1, password1 = register(team_addr)
+	headers1 = create_headers(username1, password1)
+	username2, password2 = register(team_addr)
+	headers2 = create_headers(username2, password2)
+
+	# Первый пользователь публично извиняется
+	random_text_for_username2 = gen_random_string(20)
+	data1 = {"nickname_receiver":username2,
+		"private":"false",
+		"apology_text":random_text_for_username2}
+	try:
+		res = rq.post(url.format(team_addr)+"/apology", headers=headers1, data=data1)
+	except rq.exceptions.ConnectionError:
+		close(DOWN)
+	if not "Вы успешно извинились".decode('utf-8') in res.text:
+		close(MUMBLE, "Not see message after send apology!")
+
+	# Второй пользователь публично извиняется
+	random_text_for_username1 = gen_random_string(20)
+	data2 = {"nickname_receiver":username1,
+		"private":"false",
+		"apology_text":random_text_for_username1}
+	try:
+		res = rq.post(url.format(team_addr)+"/apology", headers=headers2, data=data2)
+	except rq.exceptions.ConnectionError:
+		close(DOWN)
+	if not "Вы успешно извинились".decode('utf-8') in res.text:
+		close(MUMBLE, "Not see message after send apology!")
+
+	# Поиск публичного извинения
+	try:
+		res = rq.get(url.format(team_addr)+"/apology/find?nickname_sender={}".format(username2), headers=headers1)
+	except rq.exceptions.ConnectionError:
+		close(DOWN)
+	if not username1 in res.text:
+		close(MUMBLE, "Public apology was not added")
+
+	# Прочитать сообщение по id из поиска
+	id_apology = re.findall(r"{}&amp;id=(\w+)".format(username2), res.text)[0]
+	try:
+		res = rq.get(url.format(team_addr)+"/apology/read?nickname_sender={}&id={}".format(username2, id_apology), headers=headers1)
+	except rq.exceptions.ConnectionError:
+		close(DOWN)
+	if not random_text_for_username1 in res.text:
+		close(MUMBLE, "Not see public apology")
 	close(OK)
 
 def put(*args):
@@ -58,19 +109,33 @@ def put(*args):
 	data = {"nickname_receiver":username2,
 			"private":"true",
 			"apology_text":flag}
-	res = rq.post(url.format(team_addr)+"/apology", headers=headers, data=data)
-	if not re.findall(r"Вы успешно извинились", res.text):
+	try:
+		res = rq.post(url.format(team_addr)+"/apology", headers=headers, data=data)
+	except requests.exceptions.ConnectionError:
+		close(DOWN)
+	if not "Вы успешно извинились".decode('utf-8') in res.text:
 		close(MUMBLE, "Not see message after send apology!")
+	data = {"nickname_receiver":username2,
+			"private":"false",
+			"apology_text":gen_random_string(20)}
+	try:
+		res = rq.post(url.format(team_addr)+"/apology", headers=headers, data=data)
+	except requests.exceptions.ConnectionError:
+		close(DOWN)
+	if not "Вы успешно извинились".decode('utf-8') in res.text:
+		close(MUMBLE, "Not see message after send apology!")
+	_,_ = register(team_addr, username2, password2)
 	close(OK,"{}:{}".format(username2,password2))
 
 def get(*args):
 	team_addr, lpb, flag = args[:3]
 	username, password = lpb.split(":")
-	_,_ = register(team_addr, username, password)
 	headers = create_headers(username, password)
 	res = rq.get(url.format(team_addr)+"/input_apologies", headers=headers)
 	if flag in res.text:
 		close(OK)
+	else:
+		close(MUMBLE)
 
 def error_arg(*args):
     close(CHECKER_ERROR, private="Wrong command {}".format(sys.argv[1]))
@@ -87,30 +152,13 @@ COMMANDS = {
 }
 
 def main():
-    # ./checker.py info
-    # ./checker.py check 6.6.10.2
-    # ./checker.py put 6.6.10.2 qweq-qweq-qweq ABCDEF1234567890ABCDEF123456789= 1
-    # ./checker.py get 6.6.10.2 qweq-qweq-qweq ABCDEF1234567890ABCDEF123456789= 1
-    try:
-        COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
-    except Exception as ex:
-        close(CHECKER_ERROR, private="INTERNAL ERROR: {}".format(ex))
+    # try:
+    COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
+    # except Exception as ex:
+        # close(CHECKER_ERROR, private="INTERNAL ERROR: {}".format(ex))
 
 
 if __name__ == "__main__":
     main()
-    # gen_flag = gen_random_string(31)+"="
-    # print(gen_flag)
-    # put("127.0.0.1",gen_login(),gen_flag)
-    # get("127.0.0.1","vk5k1-q5atz-5jhcd:vi0yqn07viawnn","l8adaffdgt8qftmlj4d43kkfizobd7e=")
-    # pass
-
-# Действия чекера:
-# Чекер регистрирует пользователя для извинений aka test1
-# Регистируеет второго пользователя aka test2
-# Из под пользователя test2 извиняется перед test1 с пометкой 'Приватное извинение'
-
-# Проверка функциональности сервиса:
-# Регистрация
-# Авторизация 
-# Ошибка 404
+    # print(check("6.6.0.2"))
+    
