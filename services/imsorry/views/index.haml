@@ -1,47 +1,51 @@
 !!!
 %html
+  %head
+    %link{:rel => :stylesheet, :type => :"text/css", :href => "/static/css/style.css"}
+    %link{:href => "https://fonts.googleapis.com/css?family=Titillium+Web:400,200,200italic,300,300italic,400italic,600,600italic,700,700italic,900", :rel => "stylesheet", :type => "text/css"}
   %body
-    -if authorized?
-      %div{:display => "inline"}
-        %a{:href => "/logout"} Простите, я пошел
-        %a{:href => "/apology"} ХОЧУ ИЗВИНИТЬСЯ
-        %a{:href => "/input_apologies"} Входящие извинения
-      .content Поиск извинений
-      %form{:action => "/apology/find", :method => "get"}
-        %div
-          %input{:type => "text", :name => "nickname_sender", :placeholder => "Имя извиняющегося"}
-          %input{:type => "submit", :value => "Отправить", :name => "submit"}
-      -if locals[:result_find]
-        .content Результат поиска по юзеру "#{locals[:nickname_sender]}"
-        %table{:border => "1"} 
-          %tr
-            %td ID
-            %td NAME
-          -locals[:result_find].each do |object|
+    %div.center_block
+      -if authorized?
+        %div.center_div{:display => "inline"}
+          %a{:href => "/logout"} Простите, я пошел
+          %a{:href => "/apology"} ХОЧУ ИЗВИНИТЬСЯ
+          %a{:href => "/input_apologies"} Входящие извинения
+        .content Поиск извинений
+        %form{:action => "/apology/find", :method => "get"}
+          %div
+            %input.find{:type => "text", :name => "nickname_sender", :placeholder => "Имя извиняющегося"}
+            %input.button_find{:type => "submit", :value => "Отправить", :name => "submit"}
+        -if locals[:result_find]
+          .content Результат поиска по юзеру "#{locals[:nickname_sender]}"
+          %table{:border => "1"} 
             %tr
-              %td
-                %a{:href => "/apology/read?nickname_sender=#{locals[:nickname_sender]}&id=#{object[1]}"}= object[1]
-              %td= object[0]
-    -else
-      %p 
-        %a{:href => "/login"}Извините, можно войти?
-      %p
-        %a{:href => "/register"}Прошу прощения, меня зовут..
-    -if locals[:message] and locals[:message] != ""
-      .content Сообщение:
-      %b= locals[:message]
-
-    -if locals[:top10] and locals[:top10] != ""
-      Топ 10 извинений:
-      %table{:border => "1"} 
-        %tr
-          %td NAME
-          %td
-          %td NAME
-        -locals[:top10].each do |i| 
+              %td ID
+              %td NAME
+            -locals[:result_find].each do |object|
+              %tr
+                %td
+                  %a{:href => "/apology/read?nickname_sender=#{locals[:nickname_sender]}&id=#{object[1]}"}= object[1]
+                %td= object[0]
+      -else
+        %div.center_div{:display => "inline"}
+          %a{:href => "/login"}Извините, можно войти?
+          %a{:href => "/register"}Прошу прощения, меня зовут..
+      -if locals[:message] and locals[:message] != ""
+        .content Сообщение:
+        %b= locals[:message]
+      -if locals[:top10] and locals[:top10] != ""
+        .content Топ 10 извинений:
+        %table.top10{:border => "1"} 
           %tr
-            %td= i.username_sender
+            %td NAME
             %td
-              \=>
-            %td= i.username_receiver
+            %td NAME
+          -locals[:top10].each do |i| 
+            %tr
+              %td= i.username_sender
+              %td =>
+              %td= i.username_receiver
+    
+
+
         

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE zzz PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<root>
+  <apologies direction="out">
+    <apology id="sroQx4YVWH" private="false" nickname="zzz">
+      <apology_text>zzz</apology_text>
+    </apology>
+  <apology id="sxc8RmaAuC" private="false" nickname="sdf"><apology_text>sdfsdf</apology_text></apology><apology id="3qUo5AHaNL" private="false" nickname="sdf"><apology_text>sdfsdf</apology_text></apology></apologies>
+  <apologies direction="in">
+    <apology id="xdB0FqDNke" private="false" nickname="zzz">
+      <apology_text>zzz</apology_text>
+    </apology>
+  </apologies>
+</root>

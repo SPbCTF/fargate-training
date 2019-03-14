@@ -202,4 +202,9 @@ class Main < Sinatra::Application
       haml :index, :locals => {:message => "Вам отказано в возможности извиниться!"}
     end
   end
+
+  get "/static/css/:file" do
+    send_file("static/css/"+params[:file], :disposition => 'inline')
+  end
+
 end

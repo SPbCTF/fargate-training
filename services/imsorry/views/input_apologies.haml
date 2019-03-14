@@ -1,18 +1,21 @@
 !!!
 %html
+  %head
+    %link{:rel => :stylesheet, :type => :"text/css", :href => "/static/css/style.css"}
+    %link{:href => "https://fonts.googleapis.com/css?family=Titillium+Web:400,200,200italic,300,300italic,400italic,600,600italic,700,700italic,900", :rel => "stylesheet", :type => "text/css"}
   %body
-    %h1
-      Входящие извинения
-    %table{:border => "1"} 
-      %tr
-        %td ID
-        %td NAME
-        %td PRIVATE
-        %td TEXT
-      -locals[:res_apologies].each do |object|
+    %div.center_block
+      %h1 Входящие извинения
+      %table{:border => "1"} 
         %tr
-          %td
-            %a{:href => "/apology/read_private?id=#{object[0]}"}= object[0]
-          %td= object[1]
-          %td= object[2]
-          %td= object[3]
+          %td ID
+          %td NAME
+          %td PRIVATE
+          %td TEXT
+        -locals[:res_apologies].each do |object|
+          %tr
+            %td
+              %a{:href => "/apology/read_private?id=#{object[0]}"}= object[0]
+            %td= object[1]
+            %td= object[2]
+            %td= object[3]

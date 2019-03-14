@@ -1,16 +1,20 @@
 !!!
 %html
+  %head
+    %link{:rel => :stylesheet, :type => :"text/css", :href => "/static/css/style.css"}
+    %link{:href => "https://fonts.googleapis.com/css?family=Titillium+Web:400,200,200italic,300,300italic,400italic,600,600italic,700,700italic,900", :rel => "stylesheet", :type => "text/css"}
   %body
-    .content Принести извинения
-    %form{:action => "/apology", :method => "post"}
-      %div{:display => "inline"}
-        %input{:type => "text", :name => "nickname_receiver", :placeholder => "Кому"}
-        %input{:type => "text", :name => "private", :placeholder => "Приватно?(true|false)"}
-        %input{:type => "submit", :value => "Отправить", :name => "submit"}
-      %input{:type => "text", :name => "apology_text", :placeholder => "Текст"}
-    -if locals[:message]
-      .content Сообщение:
-      %b= locals[:message]
-    %div
-      %a{:href => "/"}
-        На главную
+    %div.center_block
+      .content Принести извинения
+      %form{:action => "/apology", :method => "post"}
+        %div.form{:display => "inline"}
+          %input.reg_form{:type => "text", :name => "nickname_receiver", :placeholder => "Кому"}
+          %input.reg_form{:type => "text", :name => "private", :placeholder => "Приватно?(true|false)"}
+          %input.submit{:type => "submit", :value => "Отправить", :name => "submit"}
+        %textarea{:type => "text", :name => "apology_text", :placeholder => "Текст"}
+      -if locals[:message]
+        .content Сообщение:
+        %b= locals[:message]
+      %div
+        %a{:href => "/"}
+          На главную
