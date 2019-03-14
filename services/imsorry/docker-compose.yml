@@ -7,3 +7,4 @@ services:
       - 14567:14567
     volumes:
       - ./db.sqlite:/usr/src/app/db.sqlite
+    restart: always

@@ -179,11 +179,6 @@ class Main < Sinatra::Application
 
 
   get '/' do
-    # get_top10.each do |i| 
-      # puts i.username_sender
-      # puts i.username_receiver
-    # end 
-    # haml :index
     haml :index, :locals => {:top10 => get_top10()}
   end
 
