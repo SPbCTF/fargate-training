@@ -7,3 +7,8 @@ services:
       - ./flags.sqlite:/cryptostorm/flags.sqlite
     ports:
       - 22228:22228
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
+    cpus: 0.8
