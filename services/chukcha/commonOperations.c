@@ -6,7 +6,7 @@
 
 void printLog(char* p){
 #ifdef DEBUG
-    FILE* f = fopen("server.log", "a+");
+    FILE* f = fopen("./files/server.log", "a+");
     fprintf(f, "%s\n", p);
     fclose(f);
 #endif

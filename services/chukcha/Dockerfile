@@ -7,7 +7,7 @@ WORKDIR /app
 ADD . .
 
 RUN apt update && \
-    apt install -yq cmake gcc g++ libevent-dev
+    apt install -yq cmake gcc g++ libevent-dev gdb
 
 RUN cmake . && cmake --build . && chmod +x start.sh
 

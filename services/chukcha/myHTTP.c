@@ -191,8 +191,8 @@ int check_and_copy(HTTP_request* request, int j){
 }
 
 int handle_put_request(HTTP_request* request, HTTP_response* response){
-    if(request->body!=NULL)
-        printf(request->body);
+    //if(request->body!=NULL)
+    //    printf(request->body);
 
 
 
@@ -276,7 +276,9 @@ int handle_HTTP_request(char* req, char** res, char* rootDir){
 
 
     int pathMark = 0;
-    if(strlen(request->path)==1){
+    int fpathMark = 0;
+if(request!=NULL){
+    if(request->path!=NULL && strlen(request->path)==1){
         char* path = (char*) malloc (strlen("index.html")+strlen(rootDir)+2);
         strcpy(path, rootDir);
         strcat(path, "/index.html");
@@ -289,7 +291,6 @@ int handle_HTTP_request(char* req, char** res, char* rootDir){
         free(path);
     }
 
-    int fpathMark = 0;
     if(request->path!=NULL && strlen(request->path)!=1){
         request->fullPath = (char*) malloc (strlen(request->path)+strlen(rootDir)+1);
         fpathMark = 1;
@@ -318,7 +319,11 @@ int handle_HTTP_request(char* req, char** res, char* rootDir){
         response->code = 400;
         response->description = "BAD REQUEST";
     }
-
+}
+else{
+	response->code = 400;
+        response->description = "BAD REQUEST";
+}
     // Размер стоит подсчитать, для тестовой реализации - упрощенный вариант
     ssize_t hSize = 0;
     for(int j=0; j<response->nHeadres; j++){
@@ -330,7 +335,7 @@ int handle_HTTP_request(char* req, char** res, char* rootDir){
             bSize = strlen(response->body);
         }
     }
-    ssize_t resultSize = strlen(response->protocol) + 1 + 3 + 1 + strlen(response->description) + 2 + hSize + bSize+2;
+    ssize_t resultSize = strlen(response->protocol) + 1 + 3 + 1 + strlen(response->description) + 2 + hSize + bSize+2+1;
     *res = (char*) malloc (resultSize);
     memset(*res, '\0', resultSize);
     char* cur = *res;
@@ -376,8 +381,10 @@ int handle_HTTP_request(char* req, char** res, char* rootDir){
             free(response->headers[j].value);
         }
     }
+    if(request!=NULL){
     free(request->headers);
     free(request);
+}
     free(response->headers);
     free(response);
     return 0;

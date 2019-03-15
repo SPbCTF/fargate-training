@@ -15,21 +15,23 @@ void handler_cb(evutil_socket_t fd, short ev_flag, void* arg){
     snprintf(log, 255, "Incoming request from [%s:%d]", hArg->ip, hArg->port);
     printLog(log);
 
-    char* request = (char*) malloc(1024*sizeof(char));              // The server is simple :) Thus only up to 1024 bytes
-    int RecvSize = recv(fd, request, 1024, MSG_NOSIGNAL);
+    char* request = (char*) malloc(2048*sizeof(char));              // The server is simple :) Thus only up to 2048 bytes
+    memset(request, '\0', 2048);   
+    int RecvSize = recv(fd, request, 2048, MSG_NOSIGNAL);
     if(RecvSize==0 && errno!=EAGAIN){
 
         struct event_base* base = event_get_base(hArg->ev);
 
-        event_free(hArg->ev);
-        shutdown(fd, SHUT_RDWR);
-        close(fd);
-        free(hArg);
+        //event_free(hArg->ev);
+        //shutdown(fd, SHUT_RDWR);
+        //close(fd);
+        //free(hArg);
+        free(request);
         event_base_loopbreak(base);
         //event_base_free(base);
     }
     else if(RecvSize!=0){
-
+	printf("%s\n", request);
         printLog("REQUEST:");
         printLog(request);
         //send(fd, Buffer, RecvSize, MSG_NOSIGNAL);
@@ -39,15 +41,15 @@ void handler_cb(evutil_socket_t fd, short ev_flag, void* arg){
 
         printLog("RESPONSE:");
         printLog(response);
-        //printf(response);
+        printf("%s\n", response);
         //printf("%d", l);
         send(fd, response, l, MSG_NOSIGNAL);
         free(request);
         free(response);
-        free(hArg->ip);
+        //free(hArg->ip);
         //event_free(hArg->ev);
-        shutdown(fd, SHUT_RDWR);
-        close(fd);
+        //shutdown(fd, SHUT_RDWR);
+        //close(fd);
         //free(hArg);
 
         //struct event_base* base = event_get_base(hArg->ev);
@@ -71,14 +73,21 @@ void* connection_handler(void* arg){
     hArg->port = hInfo->port;
     hArg->dir = hInfo->dir;
 
-    free(arg);
     /*char log[100];
     snprintf(log, 100, "ev: %X", ev);
     printLog(log);*/
 
     event_add(ev, NULL);
     event_base_dispatch(base);
+    event_del(hArg->ev);
+    event_free(hArg->ev);
+    free(hArg->ip);
+    shutdown(hInfo->fd, SHUT_RDWR);
+    close(hInfo->fd);
+
     event_base_free(base);
+    free(arg);
+    free(hArg);
 
     //pthread_exit(0);
 }

@@ -6,7 +6,7 @@ services:
     ports:
       - 1234:1234
     volumes:
-      - ./files:/app/files
+      - /home/chukcha/files:/app/files
     security_opt:
       - seccomp:unconfined
     cap_add:
