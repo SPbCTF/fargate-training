@@ -1,0 +1,51 @@
+
+body{
+  overflow:hidden;
+  padding 0;
+  margin: 0;
+  background-color:#2F3238;
+}
+.center_block {
+  width: 50vw;
+  height: 100vh;
+  margin-left: 25%;
+  padding 0;
+  }
+.center_div{
+  text-align: center;
+}
+a{
+  background-color: #7FFFD4;
+  color: #000000;
+  font-family: 'Titillium Web', sans-serif;
+}
+.content, p, b{
+  font-family: 'Titillium Web', sans-serif;
+  color: #FFFFFF;
+}
+td, h1{
+  font-family: 'Titillium Web', sans-serif;
+  color: #FFFFFF;
+  text-align: center;
+}
+.find{
+  background-color:#2F3238;
+  color: #FFFFFF;
+  float: left;
+  width: 70%;
+}
+.button_find{
+  width: 29%;
+}
+table{
+  min-width:100%;
+}
+.reg_form{
+  float: left;
+  width: 40%;
+}
+.submit{width: 18%;}
+
+textarea{
+  width: 80%;
+}

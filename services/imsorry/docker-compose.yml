@@ -1,0 +1,14 @@
+version: "2.4"
+
+services:
+  imsorry:
+    build: .
+    ports:
+      - 14567:14567
+    volumes:
+      - ./db.sqlite:/usr/src/app/db.sqlite
+    restart: always
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
