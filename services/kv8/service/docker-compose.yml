@@ -8,3 +8,7 @@ services:
     volumes:
       - ./data:/app/data
     restart: always
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
