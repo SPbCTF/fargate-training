@@ -240,8 +240,9 @@ def parse_table(html):
     table = p.tables[0]
 
     # We don't need '#' and private key in data entries, so:
-    header = table.pop(0)[1:-1]
-
+    header = ['owner', 'method', 'public']
+    table.pop(0)
+    
     data = dict()
 
     # This can be turned into list of lists for better performance if necessary
@@ -349,6 +350,7 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
     try:
         data = parse_table(html)
     except Exception as e:
+        print (e)
         close(CORRUPT, "Parsing table on /flags page failed")
 
     try:
@@ -359,10 +361,10 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
         close(CORRUPT, "No data for id {} found".format(id))
 
     try:
-        method = methods_inv[entry['Метод']]
+        method = methods_inv[entry['method']]
     except:
         close(CORRUPT, "Unknown method for id {}".format(id))
-    public = entry['Открытый ключ']
+    public = entry['public']
 
     try:
         public = str(public)
