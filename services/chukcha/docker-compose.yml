@@ -1,0 +1,18 @@
+version: "2.4"
+
+services:
+  chukcha:
+    build: .
+    ports:
+      - 1234:1234
+    volumes:
+      - ./files:/app/files
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+    restart: always
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
