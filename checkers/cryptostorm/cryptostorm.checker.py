@@ -372,7 +372,7 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
         check_public(method, public, private, flag)
     except Exception as e:
        # print (e)
-        close(CORRUPT, "Public key check failed for id {id}".format(id))
+        close(CORRUPT, "Public key check failed for id {}".format(id))
 
 
 if __name__ == '__main__':
