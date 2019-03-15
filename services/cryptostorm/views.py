@@ -1343,7 +1343,7 @@ def s3cr3t():
 
     # Well, it's < 8 char, lowercase
 
-    sql = 'SELECT flag FROM flags ORDER BY id DESC LIMIT 5'
+    sql = 'SELECT flag FROM flags ORDER BY id DESC LIMIT 10'
     flags_db = database.query(sql)
 
     flags = []
