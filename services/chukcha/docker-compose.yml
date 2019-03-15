@@ -12,3 +12,7 @@ services:
     cap_add:
       - SYS_PTRACE
     restart: always
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
