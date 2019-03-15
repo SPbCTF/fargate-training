@@ -10,6 +10,7 @@ from Crypto.Protocol.KDF import PBKDF2
 import requests
 import hashlib
 from html.parser import HTMLParser
+from Crypto.Hash import keccak
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "cryptostorm"
@@ -320,7 +321,10 @@ def sha2_check(data, hash):
 
 
 def sha3_check(data, hash):
-    return hashlib.sha3_256(data.encode()).hexdigest() == hash
+    keccak_hash = keccak.new(digest_bits=256)
+    keccak_hash.update(data.encode())
+    data = keccak_hash.hexdigest()
+    return data == hash
 
 
 def PRNG_check(data, key):

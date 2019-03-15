@@ -6,6 +6,7 @@ import base64
 from Crypto.Cipher import AES
 from Crypto import Random
 from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import keccak
 
 AES_BLOCK_SIZE = 16
 pad = lambda s: s + (AES_BLOCK_SIZE - len(s) % AES_BLOCK_SIZE) * chr(AES_BLOCK_SIZE - len(s) % AES_BLOCK_SIZE).encode()
@@ -81,11 +82,16 @@ def sha3_encrypt(flag:string):
         data = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(64))
     except:
         data = "a0e570324e6ffdbc6b9c813dec968d9bad134bc0dbb061530934f4e59c2700b9"
-    hash = hashlib.sha3_256(data.encode()).hexdigest()
+    keccak_hash = keccak.new(digest_bits=256)
+    keccak_hash.update(data.encode())
+    hash = keccak_hash.hexdigest()
     return data, hash
 
 def sha3_check(data, hash):
-    return hashlib.sha3_256(data.encode()).hexdigest() == hash
+    keccak_hash = keccak.new(digest_bits=256)
+    keccak_hash.update(data.encode())
+    data = keccak_hash.hexdigest()
+    return data == hash
 
 def PRNG_encrypt(id)->"Well, it's MD5, actually":
     try:
