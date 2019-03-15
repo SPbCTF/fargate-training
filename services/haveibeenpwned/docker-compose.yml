@@ -1,0 +1,14 @@
+version: "2.4"
+
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - ./data:/data/db
+
+  beenpwned:
+    build: .
+    ports:
+      - 5000:5000
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/

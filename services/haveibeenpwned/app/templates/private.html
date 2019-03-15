@@ -1,0 +1,93 @@
+
+
+{% extends "base.html" %}
+{% block content %}
+<div class="bodyGradient">
+   <div class="main">
+      <div class="container">
+         <div class="row logoPanel">
+            <div class="pwnedSearchResult pwnTypeDefinition pwnedWebsite panel-collapse" id="breachDescription">
+               <div class="container">
+                  <h3>Private Section. Watch and add passwords</h3>
+                   <h4 style="color: #333333">File upload and clipboard copy are under construction. Coming in October.</h4>
+                  <hr />
+               </div>
+            </div>
+            <div class="container text-center">
+               <div class="row ">
+                  <div class="col-md-5">
+                     <div class="xtraContainer" style="height: 425px;">
+                        <div class="row pwnedCompanyList">
+                           <form action="" method="post" novalidate style="color: black">
+                              {{form.hidden_tag()}}
+                              <p>
+                                 {{form.account.label}}
+                                 <br>
+                                 {{form.account(size=28)}}
+                                 {% for error in form.account.errors %}
+                              <p style="color: red;">[{{ error }}]</p>
+                              {% endfor %}
+                              </p>
+                              <p>
+                                 {{form.password.label}}
+                                 <br>
+                                 {{form.password(size=28)}}
+                                 {% for error in form.password.errors %}
+                              <p style="color: red;">[{{ error }}]</p>
+                              {% endfor %}
+                              </p>
+                              <p>
+                                 {{form.submit()}}
+                              </p>
+                               {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for msg in messages %}
+                    <p><b style="color: #cb1313">{{msg}}</b></p>
+                        {%endfor%}
+                    {% endif %}
+                    {% endwith %}
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-7" >
+                     <div class="xtraContainer">
+                        <div class="row pwnedCompanyList"  style="max-width: 80%">
+                            <div class="Mycontent" style="overflow-y:scroll; overflow-x: scroll; width:100%; text-align: left; height: 400px;">
+                           <table class="table table-dark mytable" style="table-layout: fixed">
+  <thead>
+    <tr>
+      <th scope="col" style="width: 10%">#</th>
+      <th scope="col">Account</th>
+      <th scope="col">Passwords</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% set count = namespace(a=1) %}
+  {% for account in accounts %}
+
+  <tr>
+      <th scope="row">{{count.a}}</th>
+      <td><div class="TD" style="max-width: 100%; overflow-x: scroll">{{account[0]}}</div></td>
+      <td><div class="TD" style="max-width: 100%; overflow-x: scroll">{{account[1]}}</div></td>
+    </tr>
+{% set count.a = count.a + 1 %}
+  {% endfor %}
+
+
+
+  </tbody>
+</table>
+                                </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{{super()}}
+{% endblock %}
+

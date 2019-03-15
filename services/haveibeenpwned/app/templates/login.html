@@ -1,0 +1,52 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="bodyGradient">
+    <div class="main">
+        <div class="container">
+            <div class="row logoPanel">
+                <div class="pwnedSearchResult pwnTypeDefinition pwnedWebsite panel-collapse" id="breachDescription">
+                    <div class="container">
+                        <h3>Login</h3>
+                        <hr />
+                    </div>
+                </div>
+                <div class="container text-center">
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for msg in messages %}
+                    <p><b style="color: #cb1313">{{msg}}</b></p>
+                        {%endfor%}
+                    {% endif %}
+                    {% endwith %}
+                    <form action="" method="post" novalidate style="color: black">
+        {{form.hidden_tag()}}
+        <p>
+            {{form.username.label}}
+            <br>
+            {{form.username(size=32)}}
+            {% for error in form.username.errors %}
+            <p style="color: red;">[{{ error }}]</p>
+            {% endfor %}
+        </p>
+        <p>
+            {{form.password.label}}
+            <br>
+            {{form.password(size=32)}}
+            {% for error in form.password.errors %}
+            <p style="color: red;">[{{ error }}]</p>
+            {% endfor %}
+        </p>
+        <p>
+            {{form.submit()}}
+        </p>
+
+        <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{super()}}
+{% endblock %}

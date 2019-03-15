@@ -1,0 +1,198 @@
+{% extends 'bootstrap/base.html' %}
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='pwned.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+{% endblock %}
+
+{% block title %}
+    {% if title %}{{ title }} Have I Been pwned{% else %}Have I Been Pwned: Check if your email has been compromised in a data breach{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<div class="bodyGradient">
+<header class="navbar navbar-inverse navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            </button>
+            <a href="{{url_for('index')}}" class="navbar-brand">';--</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active"><a href="{{url_for('index')}}">Home</a></li>
+                <li><a href="{{url_for('users')}}">Hall of Fame</a></li>
+                <!--<li><a href="...">Who's been pwned</a></li>-->
+                {% if auth %}
+                <li><a href="{{url_for('private')}}">Submit Passwords</a></li>
+                <li><a href="{{url_for('logout')}}">Logout</a></li>
+                {% else %}
+                <li><a href="{{url_for('login')}}">Login</a></li>
+                <li><a href="{{url_for('register')}}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</header>
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container text-center">
+   <div class="row pwnedSummaryRow">
+      <div class="col-sm-3"><span class="pwnSummaryCount">346</span><br>pwned websites</div>
+      <div class="col-sm-3"><span class="pwnSummaryCount">6,931,949,148</span><br>pwned accounts</div>
+      <div class="col-sm-3"><span class="pwnSummaryCount">90,752</span><br>pastes</div>
+      <div class="col-sm-3"><span class="pwnSummaryCount">111,967,076</span><br>paste accounts</div>
+   </div>
+   <hr />
+   <div class="row">
+      <div class="col-sm-6">
+         <h3>Largest breaches</h3>
+         <div class="row pwnedCompanyList">
+            <table>
+               <tbody>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='List.webp')}}" alt="Collection #1 logo" /></td>
+                     <td class="pwnCount">772,904,991</td>
+                     <td class="pwnCompany">Collection #1 accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Email.webp')}}" alt="Onliner Spambot logo" /></td>
+                     <td class="pwnCount">711,477,622</td>
+                     <td class="pwnCompany">Onliner Spambot accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='List.webp')}}" alt="Exploit.In logo" /></td>
+                     <td class="pwnCount">593,427,119</td>
+                     <td class="pwnCompany">Exploit.In accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='List.webp')}}" alt="Anti Public Combo List logo" /></td>
+                     <td class="pwnCount">457,962,538</td>
+                     <td class="pwnCompany">Anti Public Combo List accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Email.webp')}}" alt="River City Media Spam List logo" /></td>
+                     <td class="pwnCount">393,430,309</td>
+                     <td class="pwnCompany">River City Media Spam List accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='MySpace.webp')}}" alt="MySpace logo" /></td>
+                     <td class="pwnCount">359,420,698</td>
+                     <td class="pwnCompany">MySpace accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='NetEase.webp')}}" alt="NetEase logo" /></td>
+                     <td class="pwnCount">234,842,089</td>
+                     <td class="pwnCompany">NetEase accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='LinkedIn.webp')}}" alt="LinkedIn logo" /></td>
+                     <td class="pwnCount">164,611,595</td>
+                     <td class="pwnCompany">LinkedIn accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Dubsmash.webp')}}" alt="Dubsmash logo" /></td>
+                     <td class="pwnCount">161,749,950</td>
+                     <td class="pwnCompany">Dubsmash accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Adobe.webp')}}" alt="Adobe logo" /></td>
+                     <td class="pwnCount">152,445,165</td>
+                     <td class="pwnCompany">Adobe accounts</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+      <div class="col-sm-6">
+         <h3>Recently added breaches</h3>
+         <div class="row pwnedCompanyList">
+            <table>
+               <tbody>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='ShareThis.webp')}}" alt="ShareThis logo" /></td>
+                     <td class="pwnCount">40,960,499</td>
+                     <td class="pwnCompany">ShareThis accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Dubsmash.webp')}}" alt="Dubsmash logo" /></td>
+                     <td class="pwnCount">161,749,950</td>
+                     <td class="pwnCompany">Dubsmash accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='MyFitnessPal.webp')}}" alt="MyFitnessPal logo" /></td>
+                     <td class="pwnCount">143,606,147</td>
+                     <td class="pwnCompany">MyFitnessPal accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='MyHeritage.webp')}}" alt="MyHeritage logo" /></td>
+                     <td class="pwnCount">91,991,358</td>
+                     <td class="pwnCompany">MyHeritage accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='EyeEm.webp')}}" alt="EyeEm logo" /></td>
+                     <td class="pwnCount">19,611,022</td>
+                     <td class="pwnCompany">EyeEm accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='devkitPro.webp')}}" alt="devkitPro logo" /></td>
+                     <td class="pwnCount">1,508</td>
+                     <td class="pwnCompany">devkitPro accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='List.webp')}}" alt="Collection #1 logo" /></td>
+                     <td class="pwnCount">772,904,991</td>
+                     <td class="pwnCompany">Collection #1 accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='FaceUP.webp')}}" alt="FaceUP logo" /></td>
+                     <td class="pwnCount">87,633</td>
+                     <td class="pwnCompany">FaceUP accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='Dangdang.webp')}}" alt="Dangdang logo" /></td>
+                     <td class="pwnCount">4,848,734</td>
+                     <td class="pwnCompany">Dangdang accounts</td>
+                  </tr>
+                  <tr>
+                     <td><img class="pwnLogo tiny" src="{{url_for('static', filename='BannerBit.webp')}}" alt="BannerBit logo" /></td>
+                     <td class="pwnCount">213,415</td>
+                     <td class="pwnCompany">BannerBit accounts</td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
+
+<footer>
+   <div class="container text-center">
+      <hr />
+      <p><a href="https://www.troyhunt.com" rel="noopener">A troyhunt.com project</a></p>
+       <p><a href="https://www.troyhunt.com" rel="noopener">Modified for SPbCTF training by Shtrikh17</a></p>
+      <p>
+         <a href="https://www.facebook.com/troyahunt" rel="noopener"><i class="fa fa-facebook-square fa-3x"></i></a>
+         <a href="https://twitter.com/troyhunt" rel="noopener"><i class="fa fa-twitter-square fa-3x"></i></a>
+         <a href="https://www.troyhunt.com/contact/" rel="noopener"><i class="fa fa-envelope fa-3x"></i></a>
+      </p>
+   </div>
+</footer>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha384-rY/jv8mMhqDabXSo+UCggqKtdmBfd3qC2/KvyTDNQ6PcUJXaxK1tMepoQda4g5vB" crossorigin="anonymous"></script>
+<script nonce="IMlvZp91izMOggPXgbZ0">(window.jQuery) || document.write('<script src="/scripts/jquery"><\/script>');</script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script nonce="IMlvZp91izMOggPXgbZ0">($.fn.modal) || document.write('<script src="/scripts/bootstrap"><\/script>');</script>
+<script src="/scripts/pwned?v=mkVoVvhgnBQMdQuwGnBLBPpKhQurV142U2bjhcwPv5s1"></script>
+
+
+
+
+{% endblock %}

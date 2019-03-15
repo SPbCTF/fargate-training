@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bodyGradient">
+    <div class="main">
+        <div class="container">
+            <div class="row logoPanel">
+                <div class="pwnedSearchResult pwnTypeDefinition pwnedWebsite panel-collapse" id="breachDescription">
+                    <div class="container">
+                        <h3>These are breached emails</h3>
+                        <hr />
+                    </div>
+                </div>
+                <div class="container text-center">
+                    <div class="row pwnedSummaryRow">
+                        <div class="col-sm-24 users">
+                            <div id="pwnedSites">
+                                <div class="row pwnedCompanyList">
+                                    <table>
+                                        <tbody>
+                                        {% for each in emails %}
+                                        <tr>
+                                            <td class="pwnCompany" style="font-size: 2em; color: rgba(255,240,223,0.9)">{{each}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{super()}}
+{% endblock %}

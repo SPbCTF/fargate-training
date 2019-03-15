@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bodyGradient">
+    <div class="main">
+        <div class="container">
+            <div class="row logoPanel">
+                <div class="main-logo">
+                    <span class="logo">';--have i been pwned?</span>
+                </div>
+                <p>Check if you have an account that has been compromised in a data breach</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="searchContainer" class="secondaryHeader">
+    <div class="container">
+        <form action="/index" method="post" novalidate="novalidate">
+            <div class="input-group">
+                <input autocapitalize="off" autocorrect="off" class="form-control" data-val="true" data-val-maxlength="The field Account must be a string or array type with a maximum length of &#39;255&#39;." data-val-maxlength-max="255" data-val-minlength="The field Account must be a string or array type with a minimum length of &#39;3&#39;." data-val-minlength-min="3" id="Account" maxlength="255" name="Account" placeholder="email address" spellcheck="false" type="email" value="" />
+                <input type="hidden" name="apiEndpoint" id="apiEndpoint" value="https://api.haveibeenpwned.com/unifiedsearch/" />
+                <span class="input-group-btn">
+                <button class="btn btn-primary btn-lg" type="submit" id="searchPwnage">pwned?</button>
+                </span>
+            </div>
+            <div class="progress progress-striped active" id="loading">
+                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="tertiaryHeader panel-collapse in">
+    <div class="container">
+        <p>
+            <img src="{{url_for('static', filename='1PasswordLogo.svg')}}" alt="1Password Logo" />
+            <span>Generate secure, unique passwords for every account</span>
+            <a href="https://1password.com/haveibeenpwned/" target="_blank" class="btn btn-group-xs" rel="noopener">Learn more at 1Password.com</a>
+        </p>
+    </div>
+</div>
+
+
+<div id="invalidAccount" class="pwnedSearchResult panel-collapse  collapse ">
+    <div class="container">
+        <div class="row pwnResultBanner">
+            <h2>
+            </h2>
+        </div>
+    </div>
+</div>
+
+{% if status.request is sameas true %}
+{% if status.status is sameas false %}
+<div id="noPwnage" class="pwnedSearchResult panel-collapse">
+    <div class="container">
+        <div class="row pwnResultBanner">
+            <div class="pwnTitle">
+                <h2>Good news &mdash; no pwnage found!</h2>
+                <p>
+                    No breached accounts
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div id="pwnedWebsitesContainer">
+    <div id="pwnedWebsiteBanner" class="pwnedSearchResult pwnedRow panel-collapse">
+        <div class="container">
+            <div class="row pwnResultBanner">
+                <div class="pwnTitle">
+                    <h2>
+                        Oh no &mdash; pwned!
+                    </h2>
+                    <p id="pwnCount"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pwnedRow">
+    <div class="pwnedSearchResult pwnTypeDefinition pwnedWebsite panel-collapse" id="breachDescription">
+        <div class="container">
+            <h3>Hashes of your pwned accounts</h3>
+            <h5>Contact us for hash algorithm implementation</h5>
+            <hr />
+        </div>
+    </div>
+    <div class="container text-center">
+        <div class="row pwnedSummaryRow">
+            <div class="col-sm-12">
+                <div id="pwnedSites">
+                    <div class="row pwnedCompanyList">
+                        <table>
+                            <tbody>
+                                {% for each in passwords %}
+                                <tr>
+                                <td class="pwnCompany" style="font-size: 2em; color: rgba(255,240,223,0.9)">{{each}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endif %}
+{% endif %}
+{{super()}}
+{% endblock %}

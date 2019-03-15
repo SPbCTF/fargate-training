@@ -1,0 +1,31 @@
+.users{
+    border-width:1;
+    border-radius: 25px;
+    border-color: rgb(190,190,190);
+    border-style: solid;
+    width: 50%;
+    margin: auto;
+    }
+
+.xtraContainer{
+border-width:1;
+    border-radius: 25px;
+    border-color: rgb(190,190,190);
+    border-style: solid;
+    margin: 5px;
+}
+
+.mytable tbody>tr>td{
+    color: black;
+}
+
+.Mycontent::-webkit-scrollbar { width: 5px}
+.TD::-webkit-scrollbar { height: 5px}
+
+::-webkit-scrollbar-thumb {
+    background-color:rgb(190,190,190);
+}
+
+::-webkit-scrollbar-corner{
+    display: none;
+}
