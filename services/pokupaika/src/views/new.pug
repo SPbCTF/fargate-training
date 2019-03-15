@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  main.pa4.black-80
+  form.measure.center(method="post" action="/zakupka")
+    fieldset#sign_up.ba.b--transparent.ph0.mh0
+      .mt3.nes-field
+        label.db.fw6.lh-copy.f6(for="name") Name
+        input#name.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type="text" name='name')
+      .mv3.nes-field
+        label.db.fw6.lh-copy.f6(for='password') Description
+        input#description.b.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type='text', name='description')
+      .mv3.nes-field
+        label.db.fw6.lh-copy.f6(for='price') Price
+        input#price.b.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type='number', name='price')
+      .mv3.nes-field
+        label.db.fw6.lh-copy.f6(for='accessLevel') AccessLevel
+        input#accessLevel.b.pa2.input-reset.ba.bg-transparent.hover-bg-black.hover-white.w-100.nes-input(type='number', name='accessLevel')
+    div
+      input.b.ph3.pv2.input-reset.ba.b--black.bg-transparent.grow.pointer.f6.dib.nes-btn(type='submit', value='Create')

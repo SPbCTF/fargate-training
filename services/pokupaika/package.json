@@ -1,0 +1,37 @@
+{
+  "name": "pokupaika",
+  "version": "1.3.3.7",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "copy": "cp secrets/private.pem secrets/public.pem dist/secrets/ && cp .env dist/.env && mkdir -p dist/src/views && cp src/views/* dist/src/views/",
+    "dev": "NODE_ENV=development tsnd --respawn index.ts",
+    "build": "tsc",
+    "dist": "yarn build && yarn copy",
+    "start": "node dist/index.js",
+    "start:docker": "node index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.4",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "ioredis": "^4.6.2",
+    "jsonwebtoken": "^8.5.0",
+    "morgan": "^1.9.1",
+    "pug": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/dotenv": "^6.1.0",
+    "@types/express": "^4.16.1",
+    "@types/ioredis": "^4.0.9",
+    "@types/jsonwebtoken": "^8.3.0",
+    "@types/morgan": "^1.7.35",
+    "@types/node": "^11.10.5",
+    "ts-node-dev": "^1.0.0-pre.32",
+    "tslint": "^5.13.1",
+    "typescript": "^3.3.3333"
+  }
+}
