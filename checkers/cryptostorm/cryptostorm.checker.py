@@ -242,7 +242,7 @@ def parse_table(html):
     # We don't need '#' and private key in data entries, so:
     header = ['owner', 'method', 'public']
     table.pop(0)
-    
+
     data = dict()
 
     # This can be turned into list of lists for better performance if necessary
