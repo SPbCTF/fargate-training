@@ -92,7 +92,7 @@ def generate_rand(N=16):
 
 
 def generate_name():
-    return f"{generate_rand(4)}-{generate_rand(4)}-{generate_rand(4)}"
+    return "{}-{}-{}".format(generate_rand(4), generate_rand(4), generate_rand(4))
 
 
 def close(code, public="", private=""):
@@ -111,8 +111,8 @@ def put(*args):
         r = s.get("http://{}:{}/".format(team_addr, PORT))
 
         name, method = generate_name(), random.choice(range(len(methods)))
-        print(f"Username:{name}")
-        print(f"Algorythm: {methods[method]}")
+        print("Username:{}".format(name))
+        print("Algo: {}".format(methods[method]))
 
         if r.status_code != 200:
             close(CORRUPT, 'Status code is not 200')
@@ -127,9 +127,9 @@ def put(*args):
             close(MUMBLE, "Can't add flag")
 
         private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-        print(f"private_key: {private_key}")
+        print("private_key: {}".format(private_key))
         flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-        print(f"Flag identifier: {flag_identifier}")
+        print("Flag identifier: {}".format(flag_identifier))
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
@@ -164,8 +164,8 @@ def check(*args):
             r = s.get("http://{}:{}/".format(team_addr, PORT))
 
             name, flag = generate_name(), generate_rand(32)
-            print(f"Username:{name}")
-            print(f"Algorythm: {methods[method]}")
+            print("Username:{}".format(name))
+            print("Algo: {}".format(methods[method]))
 
             if r.status_code != 200:
                 close(CORRUPT, 'Status code is not 200')
@@ -180,9 +180,9 @@ def check(*args):
                 close(MUMBLE, "Can't add flag")
 
             private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-            print(f"private_key: {private_key}")
+            print("private_key: {}".format(private_key))
             flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-            print(f"Flag identifier: {flag_identifier}")
+            print("Flag identifier: {}".format(flag_identifier))
 
             r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
                 "private": private_key
@@ -285,7 +285,7 @@ def check_public(method, public, private, flag):
         res = False
 
     if not res:
-        close(CORRUPT, f'Check of public key on flags page failed for method {methods[method]}')
+        close(CORRUPT, 'Check of public key on flags page failed for method {}'.format(methods[method]))
 
 
 
@@ -330,7 +330,7 @@ def Decryption(d, n, c):
     try:
         m = [chr(pow(char, d, n)) for char in c]
     except:
-        close(CORRUPT, f'Check of public key on flags page failed for method RSA')
+        close(CORRUPT, 'Check of public key on flags page failed for method RSA')
     return ''.join(m)
 
 
@@ -340,7 +340,7 @@ def RSA_decrypt(d, n, message, flag):
 
 def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and RSA" = ''):
     try:
-        r = requests.get(f"http://{team_addr}:{PORT}/flags")
+        r = requests.get("http://{}:{}/flags".format(team_addr, PORT))
     except Exception as e:
         close(CORRUPT, "Request for /flags failed")
 
@@ -356,12 +356,12 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
         entry = data[id]
 
     except:
-        close(CORRUPT, f"No data for id {id} found")
+        close(CORRUPT, "No data for id {} found".format(id))
 
     try:
         method = methods_inv[entry['Метод']]
     except:
-        close(CORRUPT, f"Unknown method for id {id}")
+        close(CORRUPT, "Unknown method for id {}".format(id))
     public = entry['Открытый ключ']
 
     try:
@@ -370,7 +370,7 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
         check_public(method, public, private, flag)
     except Exception as e:
        # print (e)
-        close(CORRUPT, f"Public key check failed for id {id}")
+        close(CORRUPT, "Public key check failed for id {id}".format(id))
 
 
 if __name__ == '__main__':
