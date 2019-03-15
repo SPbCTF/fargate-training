@@ -23,7 +23,14 @@ module ApplicationHelper
     end
 
   def get_top10()
-    return List_apology.all(:limit => 10)
+    count = List_apology.count()
+    puts count
+    if count > 10
+      start = count - 10
+    else
+      start = 0
+    end
+    return List_apology.all(:offset => start, :limit => 10)
   end
 
   def authorized?

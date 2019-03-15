@@ -14,6 +14,10 @@ class Apology
 
 
   def add_to_user_apology(nickname, private, apology_text, direction)
+    begin
+      Dir.mkdir "apology"
+    rescue
+    end
     if File.file?("apology/#{@nickname_sender}.xml")
       sender_apologies_file = parse_file()
       sender_apologies_file.xpath("//apologies[@direction='#{direction}']").each do |node|
