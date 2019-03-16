@@ -7,6 +7,8 @@ from Crypto.Cipher import AES
 from Crypto import Random
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.Hash import keccak
+import gmpy2
+from flask import abort
 
 AES_BLOCK_SIZE = 16
 pad = lambda s: s + (AES_BLOCK_SIZE - len(s) % AES_BLOCK_SIZE) * chr(AES_BLOCK_SIZE - len(s) % AES_BLOCK_SIZE).encode()
@@ -105,82 +107,37 @@ def PRNG_encrypt(id)->"Well, it's MD5, actually":
 def PRNG_check(data, key):
     return hashlib.md5(data.encode()).hexdigest() == key
 
-def Generation():
-    p, q = generate_primes()
-    print (p,q)
-    n = p * q
-    phi = (p - 1) * (q - 1)
-    e = int(Arbitrary_Int_e(phi))
-    d = inverse(e, phi)
-    return e,d,n
-
-def Encryption(e, n, m):
-    c = [pow(ord(char),e,n) for char in m]
-    print(''.join(map(lambda x: str(x), c)))
-    return c
-
-def Decryption(d, n, c):
-    m =  [chr(pow(char, d, n)) for char in c]
-    print(''.join(m))
-    return ''.join(m)
-
-def mrt(odd_int):
-    odd_int = int(odd_int)
-    rng = odd_int - 2
-    n1 = odd_int - 1
-    _a = [i for i in range(2,rng)]
-    a = random.choice(_a)
-    d = n1 >> 1
-    j = 1
-    while((d&1)==0):
-        d = d >> 1
-        j += 1
-    t = a
-    p = a
-    while(d>0):
-        d = d>>1
-        p = p*p % odd_int
-        if(d&1):
-            t = t*p % odd_int
-    if(t == 1 or t == n1):
-        return True
-    for i in range(1,j):
-        t = t*t % odd_int
-        if(t==n1):
-            return True
-        if(t<=1):
-            break
-    return False
-
 from cryptostorm import randоm
 
-def gcd(a, b):
-    while b:
-        a, b = b, a%b
-    return a
+def generate_rsa():
+    while True:
+        e = 3
+        p = number.getPrime(12)
+        q = number.getPrime(10)
+        n = gmpy2.mpz(p) * gmpy2.mpz(q)
+        phi_n = gmpy2.mpz(p - 1) * gmpy2.mpz(q - 1)
 
-def Arbitrary_Int_e(phi):
-    _e = [i for i in range(1, phi)]
-    e = random.choice(_e)
-    if(gcd(e, phi) == 1 % phi):
-        return e
-    return Arbitrary_Int_e(phi)
+        if gmpy2.gcd(phi_n, e) == 1:
+            return n, e, phi_n
 
-def inverse(e, phi):
-    a, b, u = 0, phi, 1
-    while(e > 0):
-        q = b // e
-        e, a, b, u = b % e, u, e, a-q*u
-    if (b == 1):
-        return a % phi
-    else:
-        print("Must be coprime!")
+def encrypt_rsa(e, n, m):
+    c = [gmpy2.powmod(ord(char),e,n) for char in m]
+    return c
 
-def RSA_encrypt(flag):
-    e,d,n = Generation()
-    data = Encryption(e, n, flag)
+def decrypt_rsa(d, n, c):
+    try:
+        m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
+    except:
+        print("Failed to decrypt")
+        abort(400)
+    return ''.join(m)
+
+def rsa_encrypt(flag):
+    n, e, phi_n = generate_rsa()
+    d = gmpy2.invert(e, phi_n)
+    data = encrypt_rsa(e, n, flag)
     return n, e, d, data
 
-def RSA_decrypt(d, n, message, flag):
-    return Decryption(d, n, message) == flag
+def rsa_decrypt(d, n, message, flag):
+    return decrypt_rsa(d, n, message) == flag
 
