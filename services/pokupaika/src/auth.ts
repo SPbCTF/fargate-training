@@ -41,7 +41,7 @@ export const jwtMiddleware = async (
       return /* thank u, */ next();
     }
 
-    if (data) {
+    if (data!.username) {
       req.user = data;
     }
   }
