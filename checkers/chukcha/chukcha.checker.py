@@ -28,30 +28,27 @@ def close(code, public="", private=""):
 
 def put(*args):
     team_addr, flag_id, flag = args[:3]
-
+    get_success = False
     try:
-        r = requests.request("GET", "http://{}:{}/".format(team_addr, PORT))
-
         filename, filesize = generate_rand(), len(flag)
 
-        if r.status_code != 200:
-            close(CORRUPT, 'Status code is not 200')
-
         r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
+
         for j in range(5):
             if r.status_code == 200:
                 break
             time.sleep(1)
             r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
+
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if not flag in r.text:
-            close(CORRUPT, "Can't add flag", r)
+            close(MUMBLE, "Can't add flag", "Status code {}".format(r.status_code))
 
         close(OK, "{}:{}".format(filename, filesize))
 
     except Exception as e:
-        close(MUMBLE, "PUT Failed")
+        close(MUMBLE, "PUT Failed", str(e))
 
 
 
@@ -68,19 +65,22 @@ def check(*args):
 
     try:
         r = requests.request("GET", "http://{}:{}/".format(team_addr, PORT))
+        if r.status_code != 200:
+            close(DOWN, 'Status code is not 200')
+
         filesize = random.choice(range(18,32))
         filename, flag = generate_rand(),  generate_rand(filesize)
 
-        if r.status_code != 200:
-            close(CORRUPT, 'Status code is not 200')
-
         r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
-        print(r.text)
+
         for j in range(5):
             if r.status_code==200:
                 break
             time.sleep(1)
             r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
+
+        if r.status_code != 200:
+            close(DOWN)
 
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
@@ -95,7 +95,7 @@ def check(*args):
         close(OK)
 
     except Exception as e:
-        close(MUMBLE, e)
+        close(MUMBLE, "", e)
 
 
 def get(*args):
@@ -107,17 +107,20 @@ def get(*args):
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if r.status_code != 200:
-            close(CORRUPT, "No flag")
+            close(MUMBLE)
+
+        if r.text.strip() != flag:
+            close(CORRUPT, "Can't get flag", "Flag-{}, returned-{}".format(flag, r.text.strip()))
 
         r = requests.request("SIZE", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if int(r.text) != int(filesize):
-            close(CORRUPT, 'Size error')
+            close(CORRUPT, 'Size error', "Size-{}, returned-{}".format(filesize, r.text.strip()))
 
         close(OK, "{}:{}".format(filename, filesize))
 
     except Exception as e:
-        close(CORRUPT)
+        close(MUMBLE, "", str(e))
 
 
 def init(*args):

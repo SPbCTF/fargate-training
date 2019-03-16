@@ -15,7 +15,7 @@ import gmpy2
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "cryptostorm"
-PORT = 5000
+PORT = 22228
 
 methods = {0: "SHA-1", 1: "SHA-2", 2: "Keccak", 3: "PRNG", 4: "RSA", 5: "AES"}
 methods_inv = {v: k for k, v in methods.items()}
@@ -110,17 +110,7 @@ def put(*args):
     team_addr, flag_id, flag = args[:3]
     s = requests.Session()
     try:
-        try:
-            r = s.get("http://{}:{}/".format(team_addr, PORT))
-        except:
-            close(DOWN)
-
         name, method = generate_name(), random.choice(range(len(methods)))
-        #print("Username:{}".format(name))
-        #print("Algo: {}".format(methods[method]))
-
-        if r.status_code != 200:
-            close(DOWN, 'Status code is not 200')
 
         r = s.post("http://{}:{}/add".format(team_addr, PORT), {
             "name": name,
@@ -129,12 +119,11 @@ def put(*args):
         })
 
         if r.status_code != 200:
-            close(MUMBLE, "Can't add flag")
+            close(CORRUPT, "Can't add flag", "Status code - {}".format(r.status_code))
 
         private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-        #print("private_key: {}".format(private_key))
+
         flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-        #print("Flag identifier: {}".format(flag_identifier))
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
@@ -146,8 +135,7 @@ def put(*args):
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
-        #print(e)
-        close(DOWN, "PUT Failed")
+        close(MUMBLE, "PUT Failed", str(e))
 
 
 def error_arg(*args):
@@ -166,17 +154,12 @@ def check(*args):
     for method in range(len(methods)):
 
         try:
-            try:
-                r = s.get("http://{}:{}/".format(team_addr, PORT))
-            except:
-                close(DOWN)
-
-            name, flag = generate_name(), generate_rand(32)
-            #print("Username:{}".format(name))
-            #print("Algo: {}".format(methods[method]))
+            r = s.get("http://{}:{}/".format(team_addr, PORT))
 
             if r.status_code != 200:
-                close(DOWN, 'Status code is not 200')
+                close(DOWN, 'Status code is not 200', "Status code - {}".format(r.status_code))
+
+            name, flag = generate_name(), generate_rand(32)
 
             r = s.post("http://{}:{}/add".format(team_addr, PORT), {
                 "name": name,
@@ -185,12 +168,11 @@ def check(*args):
             })
 
             if r.status_code != 200:
-                close(MUMBLE, "Can't add flag")
+                close(CORRUPT, "Can't add flag")
 
             private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-            #print("private_key: {}".format(private_key))
+
             flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-            #print("Flag identifier: {}".format(flag_identifier))
 
             r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
                 "private": private_key
@@ -202,7 +184,7 @@ def check(*args):
             check_storage(team_addr, PORT, flag_identifier, private_key, flag)
 
         except Exception as e:
-            close(DOWN)
+            close(DOWN, "", e)
 
     close(OK)
 
@@ -214,12 +196,9 @@ def get(*args):
     try:
         flag_identifier, private_key = lpb.split(":")
 
-        try:
-            r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
+        r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
             })
-        except:
-            close(DOWN)
 
         if flag not in r.text:
             close(CORRUPT, "Can't decrypt flag")
@@ -229,7 +208,7 @@ def get(*args):
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
-        close(CORRUPT)
+        close(MUMBLE, "", str(e))
 
 
 def init(*args):
@@ -345,7 +324,8 @@ def decrypt_rsa(d, n, c):
     try:
         m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
     except:
-        close(CORRUPT,"RSA fialed to decrypt")
+        print("Failed to decrypt")
+        exit()
     return ''.join(m)
 
 
@@ -358,15 +338,14 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
     try:
         r = requests.get("http://{}:{}/flags".format(team_addr, PORT))
     except Exception as e:
-        close(CORRUPT, "Request for /flags failed")
+        close(CORRUPT, "Request for /flags failed", str(e))
 
     html = r.text
 
     try:
         data = parse_table(html)
     except Exception as e:
-        #print (e)
-        close(CORRUPT, "Parsing table on /flags page failed")
+        close(CORRUPT, "Parsing table on /flags page failed", str(e))
 
     try:
         id = int(id)
@@ -387,7 +366,7 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
         check_public(method, public, private, flag)
     except Exception as e:
        # print (e)
-        close(CORRUPT, "Public key check failed for id {}".format(id))
+        close(CORRUPT, "Public key check failed for id {}".format(id), str(e))
 
 
 if __name__ == '__main__':
