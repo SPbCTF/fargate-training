@@ -15,4 +15,4 @@ RUN apk del gcc build-base
 
 COPY . .
 
-CMD ["rackup", "-o", "0.0.0.0", "-p",  "4567"]
+CMD ["rackup", "-o", "0.0.0.0", "-p",  "14567"]
