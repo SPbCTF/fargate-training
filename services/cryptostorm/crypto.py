@@ -132,12 +132,12 @@ def decrypt_rsa(d, n, c):
         abort(400)
     return ''.join(m)
 
-def rsa_encrypt(flag):
+def RSA_encrypt(flag):
     n, e, phi_n = generate_rsa()
     d = gmpy2.invert(e, phi_n)
     data = encrypt_rsa(e, n, flag)
     return n, e, d, data
 
-def rsa_decrypt(d, n, message, flag):
+def RSA_decrypt(d, n, message, flag):
     return decrypt_rsa(d, n, message) == flag
 
