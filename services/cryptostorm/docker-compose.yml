@@ -8,6 +8,7 @@ services:
     ports:
       - 22228:22228
     pids_limit: 50
+    restart: always
     ulimits:
       nproc: 50
     mem_limit: 512m
