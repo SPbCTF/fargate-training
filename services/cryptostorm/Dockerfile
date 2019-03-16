@@ -2,7 +2,7 @@ FROM python:3-alpine
 
 WORKDIR /cryptostorm
 
-RUN apk add --no-cache dumb-init gcc build-base
+RUN apk add --no-cache dumb-init gcc build-base gmp-dev mpfr-dev mpc1-dev
 
 ADD requirements.txt .
 
