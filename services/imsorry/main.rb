@@ -7,14 +7,16 @@ module ApplicationHelper
 
   def forbidden!
     return if authorized?
-    halt 403, "Только для извинённых\n<div><a href='/'>На главную</a></div>"
+    render_error_page  = haml :error, :locals => {:message => "Только для извинённых"}
+    halt 403, render_error_page
   end
 
 
   def protected!
     return if authorized?
     headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
-    halt 401, "Зайди и извинись!\n<div><a href='/'>На главную</a></div>"
+    render_error_page  = haml :error, :locals => {:message => "Зайди и извинись!"}
+    halt 401, render_error_page
   end
 
 

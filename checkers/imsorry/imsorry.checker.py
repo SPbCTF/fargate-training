@@ -12,7 +12,7 @@ from traceback import format_exc
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "Z"
-PORT = 14567
+
 url = "http://{}:14567"
 def gen_random_string(N=5):
 	return "".join(choice(ascii_letters) for i in range(N))
@@ -132,11 +132,16 @@ def get(*args):
 	team_addr, lpb, flag = args[:3]
 	username, password = lpb.split(":")
 	headers = create_headers(username, password)
-	res = rq.get(url.format(team_addr)+"/input_apologies", headers=headers)
+	try:
+		res = rq.get(url.format(team_addr)+"/input_apologies", headers=headers)
+	except requests.exceptions.ConnectionError:
+		close(DOWN)
 	if flag in res.text:
 		close(OK)
+	elif not flag in res.text:
+		close(CORRUPT, "Flag not found")
 	else:
-		close(MUMBLE)
+		close(MUMBLE, "Error on page input_pology")
 
 def error_arg(*args):
     close(CHECKER_ERROR, private="Wrong command {}".format(sys.argv[1]))
@@ -161,5 +166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # print(check("6.6.0.2"))
-    
