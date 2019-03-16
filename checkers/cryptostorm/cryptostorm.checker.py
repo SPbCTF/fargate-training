@@ -116,8 +116,8 @@ def put(*args):
             close(DOWN)
 
         name, method = generate_name(), random.choice(range(len(methods)))
-        print("Username:{}".format(name))
-        print("Algo: {}".format(methods[method]))
+        #print("Username:{}".format(name))
+        #print("Algo: {}".format(methods[method]))
 
         if r.status_code != 200:
             close(DOWN, 'Status code is not 200')
@@ -132,9 +132,9 @@ def put(*args):
             close(MUMBLE, "Can't add flag")
 
         private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-        print("private_key: {}".format(private_key))
+        #print("private_key: {}".format(private_key))
         flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-        print("Flag identifier: {}".format(flag_identifier))
+        #print("Flag identifier: {}".format(flag_identifier))
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
