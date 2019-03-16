@@ -265,7 +265,7 @@ def flag_get(host, id, flag):
 
             remote_value = cmd_get(io, "flag")
             if remote_value is None or remote_value != flag:
-                quit(STATUS_MUMBLE, 'could not read flag ')
+                quit(STATUS_CORRUPT, 'could not read flag ')
             io.close()
         except Exception as e:
             quit(STATUS_MUMBLE, "exception " + str(type(e)))
