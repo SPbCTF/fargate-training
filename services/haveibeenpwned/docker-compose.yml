@@ -5,6 +5,7 @@ services:
     image: mongo
     volumes:
       - ./data:/data/db
+    cpus: 1
 
   beenpwned:
     build: .
@@ -13,3 +14,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/
     restart: always
+    pids_limit: 50
+    ulimits:
+      nproc: 50
+    mem_limit: 512m
