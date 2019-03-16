@@ -184,7 +184,7 @@ def check(*args):
             check_storage(team_addr, PORT, flag_identifier, private_key, flag)
 
         except Exception as e:
-            close(DOWN, "", e)
+            close(MUMBLE, "", e)
 
     close(OK)
 
