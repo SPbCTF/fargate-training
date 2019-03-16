@@ -146,7 +146,7 @@ def put(*args):
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
-        print(e)
+        #print(e)
         close(DOWN, "PUT Failed")
 
 
@@ -345,8 +345,7 @@ def decrypt_rsa(d, n, c):
     try:
         m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
     except:
-        print("Failed to decrypt")
-        exit()
+        close(CORRUPT,"RSA fialed to decrypt")
     return ''.join(m)
 
 
