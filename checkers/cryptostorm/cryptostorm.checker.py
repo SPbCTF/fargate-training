@@ -146,7 +146,7 @@ def put(*args):
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
     except Exception as e:
-        print(e)
+        #print(e)
         close(DOWN, "PUT Failed")
 
 
@@ -172,8 +172,8 @@ def check(*args):
                 close(DOWN)
 
             name, flag = generate_name(), generate_rand(32)
-            print("Username:{}".format(name))
-            print("Algo: {}".format(methods[method]))
+            #print("Username:{}".format(name))
+            #print("Algo: {}".format(methods[method]))
 
             if r.status_code != 200:
                 close(DOWN, 'Status code is not 200')
@@ -188,9 +188,9 @@ def check(*args):
                 close(MUMBLE, "Can't add flag")
 
             private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
-            print("private_key: {}".format(private_key))
+            #print("private_key: {}".format(private_key))
             flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
-            print("Flag identifier: {}".format(flag_identifier))
+            #print("Flag identifier: {}".format(flag_identifier))
 
             r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
                 "private": private_key
@@ -345,8 +345,7 @@ def decrypt_rsa(d, n, c):
     try:
         m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
     except:
-        print("Failed to decrypt")
-        exit()
+        close(CORRUPT,"RSA fialed to decrypt")
     return ''.join(m)
 
 
@@ -366,7 +365,7 @@ def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and
     try:
         data = parse_table(html)
     except Exception as e:
-        print (e)
+        #print (e)
         close(CORRUPT, "Parsing table on /flags page failed")
 
     try:
