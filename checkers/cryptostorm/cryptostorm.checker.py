@@ -11,6 +11,7 @@ import requests
 import hashlib
 from html.parser import HTMLParser
 from Crypto.Hash import keccak
+import gmpy2
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "cryptostorm"
@@ -109,14 +110,17 @@ def put(*args):
     team_addr, flag_id, flag = args[:3]
     s = requests.Session()
     try:
-        r = s.get("http://{}:{}/".format(team_addr, PORT))
+        try:
+            r = s.get("http://{}:{}/".format(team_addr, PORT))
+        except:
+            close(DOWN)
 
         name, method = generate_name(), random.choice(range(len(methods)))
         print("Username:{}".format(name))
         print("Algo: {}".format(methods[method]))
 
         if r.status_code != 200:
-            close(CORRUPT, 'Status code is not 200')
+            close(DOWN, 'Status code is not 200')
 
         r = s.post("http://{}:{}/add".format(team_addr, PORT), {
             "name": name,
@@ -143,7 +147,7 @@ def put(*args):
 
     except Exception as e:
         print(e)
-        close(MUMBLE, "PUT Failed")
+        close(DOWN, "PUT Failed")
 
 
 def error_arg(*args):
@@ -162,14 +166,17 @@ def check(*args):
     for method in range(len(methods)):
 
         try:
-            r = s.get("http://{}:{}/".format(team_addr, PORT))
+            try:
+                r = s.get("http://{}:{}/".format(team_addr, PORT))
+            except:
+                close(DOWN)
 
             name, flag = generate_name(), generate_rand(32)
             print("Username:{}".format(name))
             print("Algo: {}".format(methods[method]))
 
             if r.status_code != 200:
-                close(CORRUPT, 'Status code is not 200')
+                close(DOWN, 'Status code is not 200')
 
             r = s.post("http://{}:{}/add".format(team_addr, PORT), {
                 "name": name,
@@ -195,7 +202,7 @@ def check(*args):
             check_storage(team_addr, PORT, flag_identifier, private_key, flag)
 
         except Exception as e:
-            close(MUMBLE)
+            close(DOWN)
 
     close(OK)
 
@@ -207,9 +214,12 @@ def get(*args):
     try:
         flag_identifier, private_key = lpb.split(":")
 
-        r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
+        try:
+            r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
-        })
+            })
+        except:
+            close(DOWN)
 
         if flag not in r.text:
             close(CORRUPT, "Can't decrypt flag")
@@ -331,16 +341,18 @@ def PRNG_check(data, key):
     return hashlib.md5(data.encode()).hexdigest() == key
 
 
-def Decryption(d, n, c):
+def decrypt_rsa(d, n, c):
     try:
-        m = [chr(pow(char, d, n)) for char in c]
+        m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
     except:
-        close(CORRUPT, 'Check of public key on flags page failed for method RSA')
+        print("Failed to decrypt")
+        exit()
     return ''.join(m)
 
 
 def RSA_decrypt(d, n, message, flag):
-    return Decryption(d, n, message) == flag
+    return decrypt_rsa(d, n, message) == flag
+
 
 
 def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and RSA" = ''):
