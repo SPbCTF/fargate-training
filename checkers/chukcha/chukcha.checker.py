@@ -37,6 +37,8 @@ def put(*args):
             close(CORRUPT, 'Status code is not 200')
 
         r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
+        if r.status_code != 200:
+            r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
 
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
