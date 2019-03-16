@@ -37,9 +37,10 @@ def put(*args):
             close(CORRUPT, 'Status code is not 200')
 
         r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
-        if r.status_code != 200:
+        for j in range(5):
+            if r.status_code == 200:
+                break
             r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
-
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if not flag in r.text:
@@ -73,6 +74,10 @@ def check(*args):
 
         r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
         print(r.text)
+        for j in range(5):
+            if r.status_code==200:
+                break
+            r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
@@ -87,7 +92,7 @@ def check(*args):
         close(OK)
 
     except Exception as e:
-        close(MUMBLE)
+        close(MUMBLE, e)
 
 
 def get(*args):
