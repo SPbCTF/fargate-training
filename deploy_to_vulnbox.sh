@@ -18,5 +18,5 @@ if ! [ -e "./deploy" ]; then
     echo "Should run combine.sh first"
 fi
 
-scp -r deploy "root@$1:/home"
-ssh "root@$ip" cd /home && bash -c "for s in $(ls); do cd \$s && docker-compose up -d && cd -; done"
+scp -r deploy/* "root@$1:/home/"
+ssh "root@$1" 'cd /home && bash -c "for s in $(ls); do cd $s && docker-compose up -d && cd -; done"'
