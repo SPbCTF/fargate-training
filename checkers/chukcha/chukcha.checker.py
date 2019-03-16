@@ -5,6 +5,7 @@ import string
 import sys
 import requests
 import re
+import time
 
 OK, CORRUPT, MUMBLE, DOWN, CHECKER_ERROR = 101, 102, 103, 104, 110
 SERVICENAME = "chukcha"
@@ -40,11 +41,12 @@ def put(*args):
         for j in range(5):
             if r.status_code == 200:
                 break
+            time.sleep(1)
             r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if not flag in r.text:
-            close(CORRUPT, "Can't add flag" )
+            close(CORRUPT, "Can't add flag", r)
 
         close(OK, "{}:{}".format(filename, filesize))
 
@@ -77,12 +79,13 @@ def check(*args):
         for j in range(5):
             if r.status_code==200:
                 break
-            r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
+            time.sleep(1)
+            r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
 
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
         if not flag in r.text:
-            close(CORRUPT, "Can't add flag" )
+            close(CORRUPT, "Can't add flag")
 
         r = requests.request("SIZE", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
