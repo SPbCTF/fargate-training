@@ -27,7 +27,7 @@ class hash:
             self.string += string
     def digest(self):
         def permutation(source):
-            table = [1, 3, 0, 2]
+            table = [1, 5, 3, 0, 7, 2, 4, 6]
             result = []
             for t in table:
                 result.append(source[t])
