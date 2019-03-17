@@ -64,9 +64,13 @@ def check(*args):
     team_addr = args[0]
 
     try:
-        r = requests.request("GET", "http://{}:{}/".format(team_addr, PORT))
+        try:
+            r = requests.request("GET", "http://{}:{}/".format(team_addr, PORT))
+        except:
+            close(DOWN)
+
         if r.status_code != 200:
-            close(DOWN, 'Status code is not 200')
+            close(CORRUPT, 'Status code is not 200')
 
         filesize = random.choice(range(18,32))
         filename, flag = generate_rand(),  generate_rand(filesize)
@@ -80,7 +84,7 @@ def check(*args):
             r = requests.request("PUT", "http://{}:{}/{}".format(team_addr, PORT, filename), data=flag, headers=HEADERS)
 
         if r.status_code != 200:
-            close(DOWN)
+            close(CORRUPT, "PUT failed, status - " + str(r.status_code), r.text)
 
         r = requests.request("GET", "http://{}:{}/{}".format(team_addr, PORT, filename))
 
@@ -88,9 +92,12 @@ def check(*args):
             close(CORRUPT, "Can't add flag")
 
         r = requests.request("SIZE", "http://{}:{}/{}".format(team_addr, PORT, filename))
-
-        if int(r.text) != filesize:
-            close(CORRUPT, 'Size error')
+        try:
+            a = int(r.text)
+            if a != filesize:
+                close(CORRUPT, 'Size error')
+        except:
+            close(CORRUPT, "Size error")
 
         close(OK)
 
@@ -112,11 +119,13 @@ def get(*args):
         if r.text.strip() != flag:
             close(CORRUPT, "Can't get flag", "Flag-{}, returned-{}".format(flag, r.text.strip()))
 
-        r = requests.request("SIZE", "http://{}:{}/{}".format(team_addr, PORT, filename))
-
-        if int(r.text) != int(filesize):
-            close(CORRUPT, 'Size error', "Size-{}, returned-{}".format(filesize, r.text.strip()))
-
+        #r = requests.request("SIZE", "http://{}:{}/{}".format(team_addr, PORT, filename))
+        #try:
+        #    a = int(r.text)
+        #    if int(r.text) != int(filesize):
+        #        close(CORRUPT, 'Size error', "Size-{}, returned-{}".format(filesize, r.text.strip()))
+        #except:
+        #    close(CORRUPT, "Size error")
         close(OK, "{}:{}".format(filename, filesize))
 
     except Exception as e:
