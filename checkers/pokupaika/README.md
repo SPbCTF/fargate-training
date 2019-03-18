@@ -14,7 +14,7 @@
 ## Put vuln 2
 
 1. Register
-2. New zakupka with description=flag
+2. New zakupka with accessLevel!=0 and description=flag
 
 ## Get vuln 1
 
@@ -24,4 +24,4 @@
 ## Get vuln 2
 
 1. Login with creds
-2. Check zakupka
+2. Check flag in zakupka
