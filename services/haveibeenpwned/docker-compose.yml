@@ -14,6 +14,8 @@ services:
       - 5000:5000
     environment:
       - MONGO_URI=mongodb://mongo:27017/
+    volumes:
+      - ./:/app
     restart: always
     pids_limit: 50
     ulimits:

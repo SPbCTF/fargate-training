@@ -7,6 +7,7 @@ services:
       - 14567:14567
     volumes:
       - ./db.sqlite:/usr/src/app/db.sqlite
+      - ./:/usr/src/app
     restart: always
     pids_limit: 50
     ulimits:

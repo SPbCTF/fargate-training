@@ -5,6 +5,7 @@ services:
     build: .
     volumes:
       - ./flags.sqlite:/cryptostorm/flags.sqlite
+      - ./:/cryptostorm
     ports:
       - 22228:22228
     pids_limit: 50
