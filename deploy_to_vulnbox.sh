@@ -16,6 +16,7 @@ fi
 
 if ! [ -e "./deploy" ]; then
     echo "Should run combine.sh first"
+    exit
 fi
 
 scp -r deploy/* "root@$1:/home/"
