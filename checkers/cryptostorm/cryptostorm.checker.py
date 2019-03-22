@@ -110,27 +110,30 @@ def put(*args):
     team_addr, flag_id, flag = args[:3]
     s = requests.Session()
     try:
-        name, method = generate_name(), random.choice(range(len(methods)))
+        name, method = generate_name(), random.choice([0, 1, 2, 3, 5])
 
         r = s.post("http://{}:{}/add".format(team_addr, PORT), {
             "name": name,
             "flag": flag,
-            "method" : str(method)
+            "method": str(method)
         })
 
         if r.status_code != 200:
-            close(CORRUPT, "Can't add flag", "Status code - {}".format(r.status_code))
+            close(CORRUPT, "Can't add flag",
+                  "Status code - {}".format(r.status_code))
 
-        private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
+        private_key = re.search(
+            r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
 
-        flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
+        flag_identifier = re.search(
+            r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
         })
 
         if not flag in r.text:
-            close(CORRUPT, "Can't add flag" )
+            close(CORRUPT, "Can't add flag")
 
         close(OK, "{}:{}".format(flag_identifier, private_key))
 
@@ -151,13 +154,14 @@ def check(*args):
 
     s = requests.Session()
 
-    for method in range(len(methods)):
+    for method in [0, 1, 2, 3, 5]:
 
         try:
             r = s.get("http://{}:{}/".format(team_addr, PORT))
 
             if r.status_code != 200:
-                close(DOWN, 'Status code is not 200', "Status code - {}".format(r.status_code))
+                close(DOWN, 'Status code is not 200',
+                      "Status code - {}".format(r.status_code))
 
             name, flag = generate_name(), generate_rand(32)
 
@@ -170,9 +174,11 @@ def check(*args):
             if r.status_code != 200:
                 close(CORRUPT, "Can't add flag")
 
-            private_key = re.search(r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
+            private_key = re.search(
+                r'хранилища:</a></p><h4 class="lead text-muted">(.*)</h4>', r.text).group(1)
 
-            flag_identifier = re.search(r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
+            flag_identifier = re.search(
+                r'Ваш уникальный идентификатор флага: (.*)</p><', r.text).group(1)
 
             r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
                 "private": private_key
@@ -198,7 +204,7 @@ def get(*args):
 
         r = s.post("http://{}:{}/unlock/{}".format(team_addr, PORT, flag_identifier), {
             "private": private_key
-            })
+        })
 
         if flag not in r.text:
             close(CORRUPT, "Can't decrypt flag")
@@ -264,6 +270,7 @@ def check_public(method, public, private, flag):
         e = 0
         global c
         c = []
+        close(OK)
         exec(public, globals())
         c = list(map(int, c))
         private = int(private)
@@ -276,8 +283,8 @@ def check_public(method, public, private, flag):
         res = False
 
     if not res:
-        close(CORRUPT, 'Check of public key on flags page failed for method {}'.format(methods[method]))
-
+        close(CORRUPT, 'Check of public key on flags page failed for method {}'.format(
+            methods[method]))
 
 
 def get_private_key(password):
@@ -288,7 +295,7 @@ def get_private_key(password):
 
 
 def decrypt(enc, password):
-    unpad = lambda s: s[:-ord(s[len(s) - 1:])]
+    def unpad(s): return s[:-ord(s[len(s) - 1:])]
     private_key = get_private_key(password)
     enc = base64.b64decode(enc)
     iv = enc[:16]
@@ -322,7 +329,7 @@ def PRNG_check(data, key):
 
 def decrypt_rsa(d, n, c):
     try:
-        m =  [chr(gmpy2.powmod(char, d, n)) for char in c]
+        m = [chr(gmpy2.powmod(char, d, n)) for char in c]
     except:
         print("Failed to decrypt")
         exit()
@@ -331,7 +338,6 @@ def decrypt_rsa(d, n, c):
 
 def RSA_decrypt(d, n, message, flag):
     return decrypt_rsa(d, n, message) == flag
-
 
 
 def check_storage(team_addr, PORT, id, private, flag: "Only required for AES and RSA" = ''):
@@ -374,4 +380,3 @@ if __name__ == '__main__':
         COMMANDS.get(sys.argv[1], error_arg)(*sys.argv[2:])
     except Exception as ex:
         close(CHECKER_ERROR, private="INTERNAL ERROR: {}".format(ex))
-
