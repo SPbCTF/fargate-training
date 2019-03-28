@@ -1,6 +1,6 @@
 from string import  ascii_letters
 from base64 import b64encode
-from random import choice, randint
+from random import choice
 import requests as rq
 import sys 
 import re
