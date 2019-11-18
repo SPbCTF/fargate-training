@@ -65,7 +65,7 @@ GEM
     mini_portile2 (2.4.0)
     multi_json (1.13.1)
     mustermann (1.0.3)
-    nokogiri (1.10.1)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     public_suffix (3.0.3)
     rack (2.0.6)
@@ -93,7 +93,7 @@ DEPENDENCIES
   data_mapper (= 1.2.0)
   dm-sqlite-adapter (= 1.2.0)
   haml (= 5.0.4)
-  nokogiri (= 1.10.1)
+  nokogiri (= 1.10.4)
   sinatra (= 2.0.5)
   thin (= 1.7.2)
 
