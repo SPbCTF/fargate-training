@@ -19,7 +19,7 @@
     "ioredis": "^4.6.2",
     "jsonwebtoken": "^8.5.0",
     "morgan": "^1.9.1",
-    "pug": "^2.0.3"
+    "pug": "^3.0.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
